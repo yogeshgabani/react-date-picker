@@ -1,0 +1,126 @@
+import { useMemo, useState } from 'react';
+import { setMonth, setYear, getYear, getMonth, format } from 'date-fns';
+import { cn } from '../../utils/cn';
+import type { Locale } from '../../types';
+import { ChevronLeft, ChevronRight } from './Icons';
+
+interface YearMonthPickerProps {
+  visibleMonth: Date;
+  onSelect: (d: Date) => void;
+  locale?: Locale;
+  /** Range of years to expose (e.g. 1900..2100) */
+  minYear?: number;
+  maxYear?: number;
+}
+
+/**
+ * Two-panel year/month picker shown when the user clicks the month/year label
+ * in the calendar header.
+ */
+export function YearMonthPicker({
+  visibleMonth,
+  onSelect,
+  locale,
+  minYear = 1900,
+  maxYear = 2100,
+}: YearMonthPickerProps) {
+  const [mode, setMode] = useState<'year' | 'month'>('month');
+  const [yearWindow, setYearWindow] = useState(() => {
+    const y = getYear(visibleMonth);
+    return Math.floor(y / 12) * 12;
+  });
+
+  const months = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) =>
+        format(new Date(2024, i, 1), 'MMM', locale ? { locale } : undefined),
+      ),
+    [locale],
+  );
+
+  if (mode === 'year') {
+    const years = Array.from({ length: 12 }, (_, i) => yearWindow + i);
+    return (
+      <div className="rdk-p-3">
+        <div className="rdk-flex rdk-items-center rdk-justify-between rdk-pb-3">
+          <button
+            type="button"
+            aria-label="Previous years"
+            onClick={() => setYearWindow((y) => Math.max(minYear, y - 12))}
+            className="rdk-h-8 rdk-w-8 rdk-rounded-full rdk-flex rdk-items-center rdk-justify-center rdk-text-rdk-text-muted rdk-transition-all hover:rdk-bg-rdk-primary hover:rdk-text-white hover:rdk-scale-110 active:rdk-scale-95"
+          >
+            <ChevronLeft className="rdk-flip-x rdk-h-4 rdk-w-4" />
+          </button>
+          <div className="rdk-text-sm rdk-font-semibold rdk-text-rdk-text">
+            {yearWindow} – {yearWindow + 11}
+          </div>
+          <button
+            type="button"
+            aria-label="Next years"
+            onClick={() => setYearWindow((y) => Math.min(maxYear - 11, y + 12))}
+            className="rdk-h-8 rdk-w-8 rdk-rounded-full rdk-flex rdk-items-center rdk-justify-center rdk-text-rdk-text-muted rdk-transition-all hover:rdk-bg-rdk-primary hover:rdk-text-white hover:rdk-scale-110 active:rdk-scale-95"
+          >
+            <ChevronRight className="rdk-flip-x rdk-h-4 rdk-w-4" />
+          </button>
+        </div>
+        <div className="rdk-grid rdk-grid-cols-3 rdk-gap-2">
+          {years.map((y) => {
+            const selected = getYear(visibleMonth) === y;
+            return (
+              <button
+                key={y}
+                type="button"
+                onClick={() => {
+                  onSelect(setYear(visibleMonth, y));
+                  setMode('month');
+                }}
+                className={cn(
+                  'rdk-h-10 rdk-flex rdk-items-center rdk-justify-center rdk-text-center rdk-rounded-rdk-sm rdk-text-sm rdk-font-medium rdk-transition-all',
+                  selected
+                    ? 'rdk-bg-rdk-primary rdk-text-white rdk-shadow-[0_2px_8px_rgba(124,58,237,0.35)] hover:rdk-bg-rdk-primary-hover'
+                    : 'rdk-text-rdk-text hover:rdk-bg-rdk-primary-soft hover:rdk-text-rdk-primary',
+                )}
+              >
+                {y}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rdk-p-3">
+      <div className="rdk-flex rdk-items-center rdk-justify-center rdk-pb-3">
+        <button
+          type="button"
+          onClick={() => setMode('year')}
+          className="rdk-text-sm rdk-font-bold rdk-text-rdk-text rdk-px-4 rdk-py-1.5 rdk-rounded-rdk-sm rdk-transition-all hover:rdk-bg-rdk-primary-soft hover:rdk-text-rdk-primary rdk-tabular-nums"
+        >
+          {getYear(visibleMonth)}
+        </button>
+      </div>
+      <div className="rdk-grid rdk-grid-cols-3 rdk-gap-2">
+        {months.map((label, i) => {
+          const selected = getMonth(visibleMonth) === i;
+          return (
+            <button
+              key={label}
+              type="button"
+              onClick={() => onSelect(setMonth(visibleMonth, i))}
+              className={cn(
+                'rdk-h-10 rdk-rounded-rdk-sm rdk-text-sm rdk-font-medium rdk-transition-all',
+                selected
+                  ? 'rdk-bg-rdk-primary rdk-text-white rdk-shadow-sm hover:rdk-bg-rdk-primary-hover'
+                  : 'rdk-text-rdk-text hover:rdk-bg-rdk-surface-hover',
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

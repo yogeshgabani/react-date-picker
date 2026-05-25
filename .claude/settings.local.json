@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173/)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5174 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; \"done\")",
+      "Bash(curl -s http://localhost:5173/@fs/c%3A/yogesh/New%20folder%20%283%29/date-picker/src/styles.css)",
+      "WebFetch(domain:react-toast-message.netlify.app)",
+      "Bash(curl -sL https://react-toast-message.netlify.app/ -o \"C:\\\\yogesh\\\\New folder \\(3\\)\\\\date-picker\\\\_page.html\" -w \"HTTP %{http_code} | size %{size_download} bytes\\\\n\")",
+      "Bash(curl -sL \"https://react-toast-message.netlify.app/assets/index-3PVPj2qP.js\" -o \"C:\\\\yogesh\\\\New folder \\(3\\)\\\\date-picker\\\\_bundle.js\" -w \"JS HTTP %{http_code} | %{size_download} bytes\\\\n\")",
+      "Bash(curl -sL \"https://react-toast-message.netlify.app/assets/index-DXERBXHN.css\" -o \"C:\\\\yogesh\\\\New folder \\(3\\)\\\\date-picker\\\\_bundle.css\" -w \"CSS HTTP %{http_code} | %{size_download} bytes\\\\n\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const s=fs.readFileSync\\('C:/yogesh/New folder \\(3\\)/date-picker/_bundle.js','utf8'\\);const re=/\\(\\\\\"|'|\\\\`\\)\\(\\(?:[A-Za-z][A-Za-z0-9 _\\\\-.,!?:;\\(\\)/+#\\\\\\\\[\\\\\\\\]{}@'\\\\\\\\\\\\\"]{6,200}\\)\\)\\(\\\\\\\\1\\)/g;const seen=new Set\\(\\);let m;while\\(\\(m=re.exec\\(s\\)\\)\\){const t=m[2];if\\(/^[A-Za-z0-9._-]+$/.test\\(t\\)\\)continue;if\\(t.startsWith\\('http'\\)\\)continue;seen.add\\(t\\);}const arr=[...seen];fs.writeFileSync\\('C:/yogesh/New folder \\(3\\)/date-picker/_strings.txt',arr.join\\('\\\\\\\\n'\\)\\);console.log\\('strings:',arr.length\\);\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const s=fs.readFileSync\\('C:/yogesh/New folder \\(3\\)/date-picker/_bundle.js','utf8'\\);const i=s.indexOf\\('.page{'\\);if\\(i<0\\){console.log\\('not found'\\);process.exit\\(0\\);}let end=i;let depth=0;let inStr=false;let q='';for\\(let k=i;k<s.length;k++\\){const c=s[k];if\\(inStr\\){if\\(c==='\\\\\\\\\\\\\\\\'\\){k++;continue;}if\\(c===q\\){inStr=false;}continue;}if\\(c==='\\\\\"'||c==='\\\\\\\\''||c==='\\\\`'\\){inStr=true;q=c;continue;}if\\(c==='{'\\)depth++;else if\\(c==='}'\\){depth--;}if\\(c==='\\\\`'&&!inStr\\){end=k;break;}}let start=i;for\\(let k=i;k>0;k--\\){if\\(s[k]==='\\\\`'\\){start=k+1;break;}}console.log\\('start',start,'len-est',s.indexOf\\('\\\\`',i\\)-start\\);fs.writeFileSync\\('C:/yogesh/New folder \\(3\\)/date-picker/_pagecss.txt',s.substring\\(start,s.indexOf\\('\\\\`',i\\)\\)\\);\")",
+      "Bash(node \"C:/yogesh/New folder \\(3\\)/date-picker/_extract.js\")",
+      "Bash(node \"C:/yogesh/New folder \\(3\\)/date-picker/_extract.cjs\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const s=fs.readFileSync\\('C:/yogesh/New folder \\(3\\)/date-picker/_bundle.js','utf8'\\);['Premium toasts','Pick any demo','install','AOS-inspired','headless','design','beautiful','animated','npm i','npm install','Built by','Yogesh','npm  install'].forEach\\(needle=>{let i=s.indexOf\\(needle\\);if\\(i>=0\\){const start=Math.max\\(0,i-80\\),end=Math.min\\(s.length,i+200\\);console.log\\('---',JSON.stringify\\(needle\\),'@',i\\);console.log\\(s.substring\\(start,end\\).replace\\(/[\\\\\\\\n\\\\\\\\r]/g,' '\\)\\);console.log\\(\\);}else console.log\\('miss:',needle\\);}\\);\")"
+    ]
+  }
+}

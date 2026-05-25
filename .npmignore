@@ -1,0 +1,14 @@
+src
+playground
+node_modules
+*.tsbuildinfo
+.vscode
+.idea
+vite.config.ts
+tsup.config.ts
+tailwind.config.ts
+postcss.config.cjs
+tsconfig.json
+.gitignore
+.npmignore
+*.tgz

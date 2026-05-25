@@ -1,0 +1,281 @@
+setState(...): takes an object of state variables to update or a function which returns an object of state variables.");this.updater.enqueueSetState(this,e,t,"setState
+string":case"number
+Objects are not valid as a React child (found: 
+object with keys {"+Object.keys(e).join(", ")+"}":t)+"). If you meant to render a collection of children, use an array instead.
+act(...) is not supported in production builds of React.
+React.Children.only expected to receive a single React element child.
+React.cloneElement(...): The argument must be a React element, but you passed "+e+".
+forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported
+Minified React error #"+e+"; visit "+t+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+function":case"symbol":return!0;case"boolean
+children dangerouslySetInnerHTML defaultValue defaultChecked innerHTML suppressContentEditableWarning suppressHydrationWarning style".split(" 
+acceptCharset","accept-charset"],["className","class"],["htmlFor","for"],["httpEquiv","http-equiv
+contentEditable","draggable","spellCheck","value
+autoReverse","externalResourcesRequired","focusable","preserveAlpha
+checked","multiple","muted","selected
+capture","download
+cols","rows","size","span
+rowSpan","start
+xlink:actuate xlink:arcrole xlink:role xlink:show xlink:title xlink:type".split(" 
+xlinkHref",1,!1,"xlink:href","http://www.w3.org/1999/xlink",!0,!1);["src","href","action","formAction
+Lazy");case 13:return vr("Suspense");case 19:return vr("SuspenseList
+string")return e;switch(e){case Pn:return"Fragment";case Tn:return"Portal";case Ws:return"Profiler";case rl:return"StrictMode";case Hs:return"Suspense";case Ks:return"SuspenseList
+Context")+".Consumer
+Context")+".Provider
+ForwardRef("+e+")":"ForwardRef
+Context")+".Provider";case 18:return"DehydratedFragment
+ForwardRef("+e+")":"ForwardRef");case 7:return"Fragment";case 5:return t;case 4:return"Portal";case 3:return"Root";case 6:return"Text
+StrictMode":"Mode";case 22:return"Offscreen";case 12:return"Profiler";case 21:return"Scope";case 13:return"Suspense";case 19:return"SuspenseList";case 25:return"TracingMarker
+string")return t}return null}function Ut(e){switch(typeof e){case"boolean":case"number":case"string":case"undefined":return e;case"object":return e;default:return"
+checked":"value
+true":"false
+reset"){e.removeAttribute("value");return}t.hasOwnProperty("value")?Xs(e,t.type,n):t.hasOwnProperty("defaultValue
+svg":return"http://www.w3.org/2000/svg";case"math":return"http://www.w3.org/1998/Math/MathML";default:return"http://www.w3.org/1999/xhtml
+foreignObject"?"http://www.w3.org/1999/xhtml
+Webkit","ms","Moz","O
+object")throw Error(E(62))}}function ea(e,t){if(e.indexOf("-
+string";switch(e){case"annotation-xml":case"color-profile":case"font-face":case"font-face-src":case"font-face-uri":case"font-face-format":case"font-face-name":case"missing-glyph
+onClick":case"onClickCapture":case"onDoubleClick":case"onDoubleClickCapture":case"onMouseDown":case"onMouseDownCapture":case"onMouseMove":case"onMouseMoveCapture":case"onMouseUp":case"onMouseUpCapture
+test",ur,ur),window.removeEventListener("test
+focusin":case"focusout
+dragenter":case"dragleave
+mouseover":case"mouseout
+pointerover":case"pointerout":Br.delete(t.pointerId);break;case"gotpointercapture":case"lostpointercapture
+cancel":case"click":case"close":case"contextmenu":case"copy":case"cut":case"auxclick":case"dblclick":case"dragend":case"dragstart":case"drop":case"focusin":case"focusout":case"input":case"invalid":case
+keypress":case"keyup":case"mousedown":case"mouseup":case"paste":case"pause":case"play":case"pointercancel":case"pointerdown":case"pointerup":case"ratechange":case"reset":case"resize":case"seeked":case
+touchcancel":case"touchend":case"touchstart":case"volumechange":case"change":case"selectionchange":case"textInput":case"compositionstart":case"compositionend":case"compositionupdate":case"beforeblur
+afterblur":case"beforeinput":case"blur":case"fullscreenchange":case"focus":case"hashchange":case"popstate":case"select":case"selectstart":return 1;case"drag":case"dragenter":case"dragexit":case
+dragover":case"mousemove":case"mouseout":case"mouseover":case"pointermove":case"pointerout":case"pointerover":case"scroll":case"toggle":case"touchmove":case"wheel":case"mouseenter":case"mouseleave
+pointerenter":case"pointerleave":return 4;case"message
+Escape",Spacebar:" ",Left:"ArrowLeft",Up:"ArrowUp",Right:"ArrowRight",Down:"ArrowDown",Del:"Delete",Win:"OS",Menu:"ContextMenu",Apps:"ContextMenu",Scroll:"ScrollLock",MozPrintableKey:"Unidentified
+Backspace",9:"Tab",12:"Clear",13:"Enter",16:"Shift",17:"Control",18:"Alt",19:"Pause",20:"CapsLock",27:"Escape",32:" ",33:"PageUp",34:"PageDown",35:"End",36:"Home",37:"ArrowLeft",38:"ArrowUp",39:
+ArrowDown",45:"Insert",46:"Delete",112:"F1",113:"F2",114:"F3",115:"F4",116:"F5",117:"F6",118:"F7",119:"F8",120:"F9",121:"F10",122:"F11",123:"F12",144:"NumLock",145:"ScrollLock",224:"Meta
+altKey",Control:"ctrlKey",Meta:"metaKey",Shift:"shiftKey
+Unidentified":"
+deltaX"in e?e.deltaX:"wheelDeltaX"in e?-e.wheelDeltaX:0},deltaY:function(e){return"deltaY"in e?e.deltaY:"wheelDeltaY"in e?-e.wheelDeltaY:"wheelDelta
+keypress":case"mousedown":case"focusout
+compositionend":return ap(t);case"keypress
+paste":return null;case"keypress
+onChange","change
+div");tc.setAttribute("oninput","return;
+onSelect","select
+webkit"+t,n["Moz
+Animation","AnimationEnd"),animationiteration:Pi("Animation","AnimationIteration"),animationstart:Pi("Animation","AnimationStart"),transitionend:Pi("Transition","TransitionEnd
+div").style,"AnimationEvent
+onAnimationEnd");Kt(mp,"onAnimationIteration");Kt(gp,"onAnimationStart");Kt("dblclick","onDoubleClick");Kt("focusin","onFocus");Kt("focusout","onBlur");Kt(yp,"onTransitionEnd");Kn("onMouseEnter",[
+mouseover"]);Kn("onMouseLeave",["mouseout","mouseover"]);Kn("onPointerEnter",["pointerout","pointerover"]);Kn("onPointerLeave",["pointerout","pointerover"]);gn("onChange",
+onSelect","focusout contextmenu dragend focusin keydown keyup mousedown mouseup selectionchange".split(" "));gn("onBeforeInput",["compositionend","keypress","textInput","paste"]);gn("onCompositionEnd",
+onCompositionStart","compositionstart focusout keydown keypress keyup mousedown".split(" "));gn("onCompositionUpdate","compositionupdate focusout keydown keypress keyup mousedown".split(" 
+cancel close invalid load scroll toggle".split(" 
+keydown":case"keyup
+beforeblur":case"afterblur
+auxclick":case"dblclick":case"mousedown":case"mousemove":case"mouseup":case"mouseout":case"mouseover":case"contextmenu
+drag":case"dragend":case"dragenter":case"dragexit":case"dragleave":case"dragover":case"dragstart":case"drop
+touchcancel":case"touchend":case"touchmove":case"touchstart
+copy":case"cut":case"paste
+gotpointercapture":case"lostpointercapture":case"pointercancel":case"pointerdown":case"pointermove":case"pointerout":case"pointerover":case"pointerup
+contextmenu":case"mouseup":case"dragend
+selectionchange":if(By)break;case"keydown":case"keyup":oc(d,n,c)}var A;if(hl)e:{switch(e){case"compositionstart
+onCompositionStart";break e;case"compositionend
+onCompositionEnd";break e;case"compositionupdate
+onBeforeInput","beforeinput
+string"?e:"
+object with keys {"+Object.keys(t).join(", ")+"}
+r"+n.toString(32)+":
+dialog":H("cancel",r),H("close",r);break;case"iframe":case"object":case"embed":H("load",r);break;case"video":case"audio
+source":H("error",r);break;case"img":case"image":case"link":H("error",r),H("load",r);break;case"details":H("toggle",r);break;case"input":bu(r,o),H("invalid",r);break;case"select
+invalid",r);break;case"textarea":Bu(r,o),H("invalid
+children","
+scroll",r)}switch(n){case"input":vi(r),zu(r,o,!0);break;case"textarea":vi(r),Uu(r);break;case"select":case"option
+dialog":H("cancel",e),H("close
+iframe":case"object":case"embed":H("load
+video":case"audio
+source":H("error
+img":case"image":case"link":H("error",e),H("load
+details":H("toggle
+invalid",e);break;case"option
+invalid",e);break;case"textarea
+input":vi(e),zu(e,r,!1);break;case"textarea":vi(e),Uu(e);break;case"option
+value",""+Ut(r.value));break;case"select
+button":case"input":case"select":case"textarea
+children"?br(i,d):nl(i,c,d,u)}switch(a){case"input":Ys(i,o);break;case"textarea":Lf(i,o);break;case"select
+function"?o.setProperty("display","none","important
+textarea":Lf(e,n);break;case"select
+read","resolveKeyframes","update","preRender","render","postRender
+animate","variants","whileHover","whileTap","exit","whileInView","whileFocus","whileDrag"],exit:["exit"],drag:["drag","dragControls"],focus:["whileFocus"],hover:["whileHover","onHoverStart","onHoverEnd
+whileTap","onTap","onTapStart","onTapCancel"],pan:["onPan","onPanStart","onPanSessionStart","onPanEnd"],inView:["whileInView","onViewportEnter","onViewportLeave"],layout:["layout","layoutId
+animate","exit","variants","initial","style","values","variants","transition","transformTemplate","custom","inherit","onBeforeLayoutMeasure","onAnimationStart","onAnimationComplete","onUpdate",
+onDrag","onDragEnd","onMeasureDragConstraints","onDirectionLock","onDragTransitionEnd","_dragX","_dragY","onHoverStart","onHoverEnd","onViewportEnter","onViewportLeave","globalTapTarget","ignoreStrict
+viewport"]);function To(e){return e.startsWith("while
+on")?!To(t):e(t))}try{Uv(require("@emotion/is-prop-valid
+animate","whileInView","whileFocus","whileHover","whileTap","whileDrag","exit
+string"?o:"both
+animate","circle","defs","desc","ellipse","g","image","line","filter","marker","mask","metadata","path","pattern","polygon","polyline","rect","stop","switch","symbol","svg","text","tspan","use","view
+transformPerspective","x","y","z","translateX","translateY","translateZ","scale","scaleX","scaleY","rotate","rotateX","rotateY","rotateZ","skew","skewX","skewY
+translateX",y:"translateY",z:"translateZ",transformPerspective:"perspective
+stroke-dashoffset",array:"stroke-dasharray
+strokeDashoffset",array:"strokeDasharray
+baseFrequency","diffuseConstant","kernelMatrix","kernelUnitLength","keySplines","keyTimes","limitingConeAngle","markerHeight","markerWidth","numOctaves","targetX","targetY","surfaceScale",
+specularExponent","stdDeviation","tableValues","viewBox","gradientTransform","pathLength","startOffset","textLength","lengthAdjust
+x","y","width","height","cx","cy","r
+x"?"y":"x
+time")}set time(t){this.setAll("time",t)}get speed(){return this.getAll("speed")}set speed(t){this.setAll("speed",t)}get startTime(){return this.getAll("startTime
+flatten")}play(){this.runAll("play")}pause(){this.runAll("pause")}cancel(){this.runAll("cancel")}complete(){this.runAll("complete
+div").animate({opacity:0},{easing:"linear(0, 1)"})}catch{return!1}return!0},"linearEasing
+linear",ease:"ease",easeIn:"ease-in",easeOut:"ease-out",easeInOut:"ease-in-out
+pointerleave",c)});l.addEventListener("pointerleave
+BUTTON","INPUT","SELECT","TEXTAREA","A
+cancel");n.addEventListener("keyup",i,t),n.addEventListener("blur",o,t)});n.addEventListener("keydown",r,t),n.addEventListener("blur
+pointerup",d),window.removeEventListener("pointercancel
+pointerup",d,i),window.addEventListener("pointercancel
+pointerdown",s,i),a.addEventListener("focus
+width","height","top","left","right","bottom
+rgb","red"),parse:pm("red","green","blue
+rgba("+Ms.transform(e)+", "+Ms.transform(t)+", "+Ms.transform(n)+", "+Lr(ni.transform(r))+")
+hsl","hue"),parse:pm("hue","saturation","lightness
+hsla("+Math.round(e)+", "+ct.transform(Lr(t))+", "+ct.transform(Lr(n))+", "+Lr(ni.transform(r))+")
+string"?e:e.hasOwnProperty("red
+brightness","contrast","saturate","opacity
+auto","none","0
+x","y","z
+none","hidden
+duration","bounce
+stiffness","damping","mass
+opacity","clipPath","filter","transform
+linear":c,fill:"both
+reverse"?"alternate":"normal
+pointermove",this.handlePointerMove),_r(this.contextWindow,"pointerup",this.handlePointerUp),_r(this.contextWindow,"pointercancel
+left","right"),y:Sd(e,"top","bottom
+x"),e("y
+x",d.point,k),this.updateAxis("y
+borderTopLeftRadius","borderTopRightRadius","borderBottomLeftRadius","borderBottomRightRadius
+TopLeft","TopRight","BottomLeft","BottomRight
+x","scaleX","originX
+y","scaleY","originY
+X","Y","Z
+applewebkit/
+chrome/
+End":"Cancel
+amount","margin","root
+AnimationStart","AnimationComplete","Update","BeforeLayoutMeasure","LayoutMeasure","LayoutAnimationStart","LayoutAnimationComplete
+primary"?"rtoast-action":"rtoast-action rtoast-action--cancel";return x.jsx("button",{type:"button
+Close notification"}){return x.jsx("button",{type:"button","aria-label
+svg",{width:"14",height:"14",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2.2",strokeLinecap:"round",strokeLinejoin:"round","aria-hidden":"true",children:[x.jsx("line",{x1:"18
+line",{x1:"6",y1:"6",x2:"18",y2:"18
+none",stroke:"currentColor",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round","aria-hidden
+span",{className:"rtoast-icon","aria-hidden":"true",children:t});switch(e){case"success":return x.jsx("span",{className:"rtoast-icon","aria-hidden":"true",children:x.jsxs("svg",{...yr,children:[x.jsx(
+path",{d:"m8 12 3 3 5-6"})]})});case"error":return x.jsx("span",{className:"rtoast-icon","aria-hidden":"true",children:x.jsxs("svg",{...yr,children:[x.jsx("circle",{cx:"12",cy:"12",r:"10"}),x.jsx("line
+line",{x1:"9",y1:"9",x2:"15",y2:"15"})]})});case"warning":return x.jsx("span",{className:"rtoast-icon","aria-hidden":"true",children:x.jsxs("svg",{...yr,children:[x.jsx("path",{d:
+line",{x1:"12",y1:"9",x2:"12",y2:"13"}),x.jsx("line",{x1:"12",y1:"17",x2:"12.01",y2:"17"})]})});case"info":return x.jsx("span",{className:"rtoast-icon","aria-hidden":"true",children:x.jsxs("svg
+circle",{cx:"12",cy:"12",r:"10"}),x.jsx("line",{x1:"12",y1:"16",x2:"12",y2:"12"}),x.jsx("line",{x1:"12",y1:"8",x2:"12.01",y2:"8"})]})});case"loading":return x.jsx("span",{className:
+aria-hidden":"true",children:x.jsx("svg",{...yr,children:x.jsx("path",{d:"M21 12a9 9 0 1 1-6.219-8.56
+aria-hidden":"true",children:x.jsx("div",{className:"rtoast-progress__bar
+paused":"running
+zustand/traditional
+import { useStore } from 'zustand'
+fade-up","fade-down","fade-left","fade-right","fade-up-right","fade-up-left","fade-down-right","fade-down-left","slide-up","slide-down","slide-left","slide-right","zoom-in","zoom-out","zoom-in-up",
+zoom-in-left","zoom-in-right","zoom-out-up","zoom-out-down","zoom-out-left","zoom-out-right","flip-up","flip-down","flip-left","flip-right
+blur(8px)",scale:.96},animate:{opacity:1,y:0,filter:"blur(0px)
+blur(6px)",scale:.96,transition:{duration:.22,ease:[.4,0,1,1]}}},transition:uf};case"scale
+easeIn"}}},transition:lf};case"spring
+y"?e:t.endsWith("center")?"y":"x
+warning"?"alert":"status
+warning"?"assertive":"polite
+glass"?"rtoast--glass
+div",{className:"rtoast-body
+div",{className:"rtoast-actions
+aria-live":_,"aria-atomic":"true","data-toast-id":e.id,"data-type":e.type,"data-position
+initial",animate:"animate",exit:"exit
+grabbing"}:void 0,children:x.jsx("div",{className:"rtoast-inner
+top-left","top-center","top-right","bottom-left","bottom-center","bottom-right
+fixed",zIndex:999999};return e.startsWith("top
+altKey","KeyT
+blur",F),window.addEventListener("focus
+blur",F),window.removeEventListener("focus
+top-left":[],"top-center":[],"top-right":[],"bottom-left":[],"bottom-center":[],"bottom-right
+data-rich-colors":r?"true":void 0,"data-dir
+rtoast-list--expanded":"rtoast-list--collapsed
+data-position":F,tabIndex:-1,"aria-label":"Notifications
+default",e,t)}function JS(e,t){return Xt("success",e,t)}function ek(e,t){return Xt("error",e,t)}function tk(e,t){return Xt("warning",e,t)}function nk(e,t){return Xt("info
+function"?t.description(s,"success"):void 0;Ee.getState().update(r,{type:"success
+function"?t.description(s,"error"):void 0;Ee.getState().update(r,{type:"error
+fade-up","fade-down","fade-left","fade-right","fade-up-right","fade-up-left","fade-down-right","fade-down-left","zoom-in","zoom-out","zoom-in-up","zoom-out-down","flip-up","flip-down","flip-left",
+slide-up","slide-down","slide-left","slide-right
+slide","blur-fade","scale","spring","bounce
+basics",label:"Basics",hint:"Five core toast types"},{id:"variants",label:"Variants",hint:"Glass, gradient, rich colors"},{id:"interactive",label:"Interactive",hint:"Actions, promises, updates"},{id:
+Animations",hint:"AOS-inspired entrances"},{id:"advanced",label:"Advanced",hint:
+indigo",label:"Indigo",preview:"linear-gradient(135deg, #6366f1, #8b5cf6)",default:"linear-gradient(135deg, #6366f1, #8b5cf6)",success:"linear-gradient(135deg, #10b981, #059669)",error:
+linear-gradient(135deg, #f59e0b, #d97706)",info:"linear-gradient(135deg, #3b82f6, #2563eb)"},{id:"sunset",label:"Sunset",preview:"linear-gradient(135deg, #f97316, #db2777)",default:
+linear-gradient(135deg, #f59e0b, #84cc16)",error:"linear-gradient(135deg, #f43f5e, #7c2d12)",warning:"linear-gradient(135deg, #fbbf24, #ea580c)",info:"linear-gradient(135deg, #f97316, #6366f1)"},{id:
+Ocean",preview:"linear-gradient(135deg, #06b6d4, #2563eb)",default:"linear-gradient(135deg, #06b6d4, #2563eb)",success:"linear-gradient(135deg, #14b8a6, #0284c7)",error:
+linear-gradient(135deg, #fbbf24, #0ea5e9)",info:"linear-gradient(135deg, #38bdf8, #1d4ed8)"},{id:"forest",label:"Forest",preview:"linear-gradient(135deg, #16a34a, #064e3b)",default:
+linear-gradient(135deg, #22c55e, #166534)",error:"linear-gradient(135deg, #ef4444, #064e3b)",warning:"linear-gradient(135deg, #eab308, #166534)",info:"linear-gradient(135deg, #14b8a6, #065f46)"},{id:
+Candy",preview:"linear-gradient(135deg, #ec4899, #a855f7)",default:"linear-gradient(135deg, #ec4899, #a855f7)",success:"linear-gradient(135deg, #34d399, #a855f7)",error:
+linear-gradient(135deg, #fbbf24, #ec4899)",info:"linear-gradient(135deg, #60a5fa, #a855f7)
+react-toaster-message/styles.css
+Copied to clipboard
+Copy failed",{description:"Clipboard access was blocked.
+default",label:"Default",description:"A plain neutral toast.",icon:
+Event has been created",{description:"Sunday, December 03 at 9:00 AM"})},{id:"success",label:"Success",description:"Confirm a positive outcome.",icon:
+File uploaded successfully")},{id:"error",label:"Error",description:"Surface failure with retry context.",icon:
+Something went wrong",{description:"Please try again later."})},{id:"warning",label:"Warning",description:"Caution the user, non-blocking.",icon:
+Heads up",{description:"Storage is almost full."})},{id:"info",label:"Info",description:"Non-urgent informational note.",icon:
+New version available")},{id:"loading",label:"Loading",description:"Indeterminate async work in progress.",icon:
+glass",label:"Glass",description:"Backdrop-blur, frosted look.",icon:
+Glass variant",{variant:"glass",description:"Backdrop-blur premium look."})},{id:"gradient",label:"Gradient",description:"Soft gradient surface.",icon:
+Gradient variant",{variant:"gradient"})},{id:"rich",label:"Rich color",description:"Bold semantic tinting.",icon:
+Rich color error",{richColors:!0,description:"High-contrast semantic styling."})},{id:"custom-icon",label:"Custom icon",description:"Bring your own visual.",icon:
+Custom icon",{icon:
+Drop in any ReactNode as the icon."})},{id:"action",label:"Action / Undo",description:"Single primary action.",icon:
+Item moved to trash",{action:{label:"Undo
+Restored")}})},{id:"confirm",label:"Confirmation",description:"Primary + cancel, sticky duration.",icon:
+Delete project?",{duration:1/0,action:{label:"Delete
+Deleted")},cancel:{label:"Cancel
+promise",label:"Promise",description:
+report.pdf"}),2e3)),{loading:
+Upload failed"})},{id:"update",label:"Update live",description:"Mutate an existing toast in place.",icon:
+success",title:"Done!
+progress",label:"Progress bar",description:"Visual countdown to auto-close.",icon:
+With progress",{progressBar:!0,duration:5e3,closeButton:!0})},{id:"spam",label:"Stress test",description:"Queue 6 errors rapidly.",icon:
+Something went wrong
+long",label:"Long content",description:"Multi-line body wrapping.",icon:
+Read the changelog",{description:
+sticky",label:"Sticky (no auto)",description:"Stays until dismissed.",icon:
+Sticky toast",{duration:1/0,closeButton:!0,description:"This will not auto-close."})},{id:"dismiss",label:"Dismiss all",description:"Clear the entire stack.",icon:
+div",{className:"page",children:[x.jsx("style",{children:mk}),x.jsx("header",{className:"hero",children:x.jsxs("div",{className:"hero-inner",children:[x.jsxs("div",{className:"hero-top
+div",{className:"brand",children:[x.jsxs("div",{className:"brand-mark",children:[x.jsx("span",{className:"dot dot-a"}),x.jsx("span",{className:"dot dot-b"}),x.jsx("span",{className:"dot dot-c
+span",{className:"brand-text",children:"react-toaster-message"})]}),x.jsxs("div",{className:"hero-actions",children:[x.jsx("a",{className:"ghost-btn",href:
+noreferrer",children:"npm"}),x.jsx("a",{className:"ghost-btn",href:"https://github.com/yogeshgabani/react-toast-message",target:"_blank",rel:"noreferrer",children:"GitHub"}),x.jsx("button",{className:
+dark"?"light":"dark"),"aria-label":"Toggle page theme",title:"Toggle page theme
+div",{className:"hero-content",children:[x.jsx("span",{className:"pill",children:
+h1",{className:"title",children:["Premium toasts",x.jsx("br",{}),x.jsx("span",{className:"title-grad",children:"for modern React apps."})]}),x.jsx("p",{className:"lede",children:
+div",{className:"hero-cta",children:[x.jsxs("code",{className:"install",children:[x.jsx("span",{className:"prompt",children:
+button",{className:"primary-btn
+Pick any demo below to explore."}),children:"Try a toast"})]})]})]})}),x.jsxs("main",{className:"main",children:[x.jsxs("section",{className:"control-card",children:[x.jsxs("div",{className:
+h2",{children:"Live controls"}),x.jsx("p",{children:
+div",{className:"control-grid",children:[x.jsx(kn,{label:"Theme",children:x.jsx(cf,{value:e,options:["light","dark","system","glass","gradient
+Position",children:x.jsx("div",{className:"position-grid",role:"radiogroup","aria-label":"Position
+button",{role:"radio","aria-checked
+is-active":"
+Gradient palette",children:x.jsx("div",{className:"palette-row",role:"radiogroup","aria-label":"Gradient palette
+span",{className:"palette-swatch",style:{background:D.preview}}),x.jsx("span",{className:"palette-label",children:D.label})]},D.id))})}),x.jsx(kn,{label:"Max visible",children:x.jsx("div",{className:
+radiogroup","aria-label":"Max visible toasts
+Options",children:x.jsxs("div",{className:"toggle-row",children:[x.jsx(Bs,{checked:s,onChange:a,label:"Rich colors"}),x.jsx(Bs,{checked:l,onChange:u,label:"Close button
+Progress bar"})]})})]})]}),x.jsx("section",{className:"tabs",children:x.jsx("div",{className:"tabs-bar",role:"tablist
+button",{role:"tab","aria-selected
+span",{className:"tab-label",children:D.label}),x.jsx("span",{className:"tab-hint",children:D.hint})]},D.id))})}),x.jsx("section",{className:"demos
+button",{className:"demo-card",onClick:D.run,children:[x.jsx("div",{className:"demo-icon","aria-hidden":!0,children:D.icon}),x.jsxs("div",{className:"demo-body",children:[x.jsx("div",{className:
+div",{className:"demo-desc",children:D.description})]}),x.jsx("div",{className:"demo-go","aria-hidden":!0,children:
+section",{className:"snippet-card",children:[x.jsxs("div",{className:"snippet-head",children:[x.jsx("h3",{children:"Current setup"}),x.jsx("button
+is-copied":"
+aria-label":"Copy snippet",children:P?x.jsxs(x.Fragment,{children:[x.jsx("span",{"aria-hidden":!0,children:
+span",{"aria-hidden":!0,children:
+pre",{className:"snippet",children:T})]}),x.jsxs("footer",{className:"footer",children:[x.jsxs("div",{children:["Built by ",x.jsx("strong",{children:"Yogesh Gabani"}),
+div",{className:"footer-links",children:[x.jsx("a",{href:"https://react-toast-message.netlify.app/",target:"_blank",rel:"noreferrer",children:"Live demo"}),x.jsx("a",{href:
+noreferrer",children:"npm"}),x.jsx("a",{href:"https://github.com/yogeshgabani/react-toast-message",target:"_blank",rel:"noreferrer",children:"Source
+div",{className:"control",children:[x.jsx("div",{className:"control-label",children:e}),x.jsx("div",{className:"control-body",children:t})]})}function cf({value:e,options:t,onChange:n}){return x.jsx(
+segmented",role:"radiogroup","aria-label":"Segmented control
+is-on":"
+input",{type:"checkbox
+span",{className:"track",children:x.jsx("span",{className:"thumb"})}),x.jsx("span",{className:"toggle-label
+Segoe UI", Roboto, "Helvetica Neue
