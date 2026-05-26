@@ -2,6 +2,11 @@
 
 A modern, accessible, **headless-inside / pretty-outside** date &amp; time picker toolkit for React. Six picker variants share one API, one theming model, and one keyboard-/screen-reader–friendly core.
 
+
+## 🚀 Live Demo
+
+**👉 [react-datetime-picker.netlify.app](https://react-datetime-picker.netlify.app/)**
+
 ```
 DatePicker · DateRangePicker · TimePicker · TimeRangePicker
 DateTimePicker · DateTimeRangePicker
@@ -548,3 +553,6 @@ Modern evergreen browsers (Chrome, Edge, Firefox, Safari — last two stable ver
 ## License
 
 [MIT](./LICENSE) © react-datetime-kit
+MIT License - Copyright (c) 2026 **Yogesh Gabani**
+
+Built by **Yogesh Gabani**.
