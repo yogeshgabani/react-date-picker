@@ -23,6 +23,69 @@ const SITE_LAST_UPDATED = "May 28, 2026";
 const STATS_NAMESPACE = "react-datetime-kit-playground";
 const SESSION_VISIT_FLAG = "rdtk_visited";
 const THEME_STORAGE_KEY = "rdtk-theme-pref";
+const WHATS_NEW_STORAGE_KEY = "rdtk-whatsnew-seen";
+
+type ChangelogSectionKind = "added" | "changed" | "fixed" | "technical" | "docs";
+type ChangelogSection = {
+  kind: ChangelogSectionKind;
+  title: string;
+  items: string[];
+};
+type ChangelogEntry = {
+  version: string;
+  date: string;
+  highlight?: string;
+  isLatest?: boolean;
+  sections: ChangelogSection[];
+};
+
+const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.0.0",
+    date: "May 28, 2026",
+    highlight: "First stable release — API is now stable and follows semver.",
+    isLatest: true,
+    sections: [
+      {
+        kind: "added",
+        title: "Added",
+        items: [
+          "Six picker components with a consistent API: DatePicker, DateRangePicker, TimePicker, TimeRangePicker, DateTimePicker, DateTimeRangePicker.",
+          "Headless hooks — useDatePicker, useDateRange, useTimePicker, useControllableState, useCalendarKeyboard.",
+          "Moment-style format tokens (DD/MM/YYYY, hh:mm A) translated to date-fns internally, with a lenient parser that accepts either flavor.",
+          "Theming via CSS variables — override --rdk-color-*, --rdk-radius, --rdk-font, --rdk-shadow on any ancestor. No JS theme config required.",
+          "Light + dark themes out of the box with auto / light / dark modes; auto follows prefers-color-scheme.",
+          "Accessibility built-in — WAI-ARIA roles, full keyboard navigation, focus trap inside popovers, screen-reader labels.",
+          "i18n + RTL via the date-fns locale prop, configurable weekStartsOn, and first-class dir=\"rtl\" support.",
+          "Floating UI positioning — popovers flip/shift to stay in the viewport with stable initial paint.",
+          "Range presets sidebar (Today, Last 7 days, This month, Last 3 months, …) or pass a custom presets array.",
+          "Custom day rendering via renderDay={(date, defaultNode) => …} for badges, holidays, custom cell backgrounds.",
+          "Two-month / multi-month calendars and optional ISO week numbers for range pickers.",
+        ],
+      },
+      {
+        kind: "technical",
+        title: "Technical",
+        items: [
+          "Tree-shakeable ESM + CJS dual build with separate .d.ts / .d.cts type definitions.",
+          "Tiny footprint — only @floating-ui/react is bundled; date-fns and React are peer dependencies.",
+          "Works with React 17, 18, and 19 (peer range >=17.0.0).",
+          "Side-effect-free JS — only *.css is marked as a side effect so unused pickers are dropped by bundlers.",
+        ],
+      },
+      {
+        kind: "docs",
+        title: "Documentation",
+        items: [
+          "Complete README — installation, every picker, props tables, theming guide, i18n, custom day rendering, keyboard shortcuts and headless-hook examples.",
+          "Live playground with click-to-customize modal for every picker, a custom-format demo, and copy-ready code snippets.",
+        ],
+      },
+    ],
+  },
+];
+
+const LATEST_VERSION = CHANGELOG[0].version;
 
 // Resolve the initial dark-mode value: explicit user choice from a
 // previous visit wins; otherwise mirror the OS / browser preference.
@@ -234,6 +297,28 @@ export function App() {
   const [copied, setCopied] = useState<"install" | "import" | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [showTop, setShowTop] = useState(false);
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false);
+  const [whatsNewSeen, setWhatsNewSeen] = useState<string | null>(() => {
+    if (typeof window === "undefined") return LATEST_VERSION;
+    try {
+      return window.localStorage.getItem(WHATS_NEW_STORAGE_KEY);
+    } catch {
+      return LATEST_VERSION;
+    }
+  });
+  const hasUnseenWhatsNew = whatsNewSeen !== LATEST_VERSION;
+
+  const openWhatsNew = () => {
+    setWhatsNewOpen(true);
+    if (hasUnseenWhatsNew) {
+      try {
+        window.localStorage.setItem(WHATS_NEW_STORAGE_KEY, LATEST_VERSION);
+      } catch {
+        /* localStorage blocked — fail silently */
+      }
+      setWhatsNewSeen(LATEST_VERSION);
+    }
+  };
 
   // Toggle dark mode AND persist the user's manual choice so the next
   // visit honors it instead of snapping back to system preference.
@@ -353,6 +438,20 @@ export function App() {
     };
   }, [comingSoon]);
 
+  useEffect(() => {
+    if (!whatsNewOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setWhatsNewOpen(false);
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [whatsNewOpen]);
+
   const handleSocialClick = (
     e: ReactMouseEvent<HTMLAnchorElement>,
     link: SocialLink,
@@ -400,6 +499,28 @@ export function App() {
               </svg>
               GitHub
             </a>
+            <button
+              type="button"
+              className={`pg-pill pg-pill-whatsnew ${hasUnseenWhatsNew ? "has-unseen" : ""}`}
+              onClick={openWhatsNew}
+              aria-label="What's new"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 2l2.39 5.16L20 8.27l-4 3.9.94 5.52L12 15l-4.94 2.69L8 12.17l-4-3.9 5.61-1.11L12 2z" />
+              </svg>
+              What's new
+              {hasUnseenWhatsNew && (
+                <span className="pg-pill-new-dot" aria-hidden="true" />
+              )}
+            </button>
             <button
               type="button"
               className="pg-pill"
@@ -1516,6 +1637,124 @@ export function App() {
       </button>
 
       {/* ============ COMING SOON MODAL ============ */}
+      {whatsNewOpen && (
+        <div
+          className="pg-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pg-wn-title"
+          onClick={() => setWhatsNewOpen(false)}
+        >
+          <div
+            className="pg-modal pg-wn-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="pg-modal-close"
+              aria-label="Close"
+              onClick={() => setWhatsNewOpen(false)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
+            <div className="pg-modal-glow" aria-hidden="true" />
+
+            <div className="pg-wn-head">
+              <span className="pg-modal-chip">
+                <span className="pg-modal-chip-dot" />
+                Changelog
+              </span>
+              <h3 id="pg-wn-title" className="pg-modal-title">
+                What's new in react-datetime-kit
+              </h3>
+              <p className="pg-modal-desc">
+                Release notes for every version. Latest changes at the top.
+              </p>
+            </div>
+
+            <div className="pg-wn-body">
+              {CHANGELOG.map((entry) => (
+                <article
+                  key={entry.version}
+                  className="pg-wn-version"
+                  aria-labelledby={`pg-wn-v-${entry.version}`}
+                >
+                  <header className="pg-wn-vhead">
+                    <div className="pg-wn-vmeta">
+                      <h4
+                        id={`pg-wn-v-${entry.version}`}
+                        className="pg-wn-vtitle"
+                      >
+                        v{entry.version}
+                      </h4>
+                      {entry.isLatest && (
+                        <span className="pg-wn-badge">Latest</span>
+                      )}
+                    </div>
+                    <time className="pg-wn-vdate">{entry.date}</time>
+                  </header>
+
+                  {entry.highlight && (
+                    <p className="pg-wn-highlight">{entry.highlight}</p>
+                  )}
+
+                  {entry.sections.map((section) => (
+                    <section
+                      key={section.kind}
+                      className="pg-wn-section"
+                      data-kind={section.kind}
+                    >
+                      <span
+                        className={`pg-wn-section-tag pg-wn-tag-${section.kind}`}
+                      >
+                        {section.title}
+                      </span>
+                      <ul className="pg-wn-list">
+                        {section.items.map((item, i) => (
+                          <li key={i} className="pg-wn-item">
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  ))}
+                </article>
+              ))}
+            </div>
+
+            <div className="pg-wn-footer">
+              {/* <a
+                className="pg-modal-btn pg-modal-btn-ghost"
+                href="https://github.com/yogeshgabani/react-datetime-kit/blob/main/CHANGELOG.md"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                Full changelog
+              </a> */}
+              <button
+                type="button"
+                className="pg-modal-btn pg-modal-btn-primary"
+                onClick={() => setWhatsNewOpen(false)}
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {comingSoon && (
         <div
           className="pg-modal-overlay"

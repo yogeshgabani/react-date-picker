@@ -16,10 +16,14 @@ body {
      wide content (e.g. <pre> code blocks, picker popovers measured
      during Floating UI's first paint) loads before final layout — the
      visual symptom is the page rendering in only the left half of the
-     viewport until a React re-render forces a reflow. */
+     viewport until a React re-render forces a reflow.
+     `clip` (with hidden fallback) keeps the cap on horizontal overflow
+     without creating a scroll container, which is what would otherwise
+     break `position: sticky` on the topbar. */
   width: 100%;
   min-width: 0;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 #root {
   width: 100%;
@@ -89,6 +93,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   position: relative;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Aurora background blobs */
@@ -1817,6 +1822,253 @@ body[data-theme='dark'] .pg-modal-icon.pg-social-twitter .pg-modal-icon-ring {
 
 body[data-theme='dark'] .pg-modal {
   background: rgba(28, 28, 36, 0.92);
+}
+
+/* =========================================================
+   What's New trigger pill + modal
+   ========================================================= */
+.pg-pill-whatsnew {
+  position: relative;
+}
+.pg-pill-whatsnew svg {
+  width: 13px;
+  height: 13px;
+}
+.pg-pill-whatsnew.has-unseen {
+  border-color: rgba(124, 58, 237, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.10),
+    rgba(96, 165, 250, 0.08)
+  );
+  color: var(--pg-accent);
+}
+.pg-pill-whatsnew.has-unseen:hover {
+  border-color: rgba(124, 58, 237, 0.65);
+}
+.pg-pill-new-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--pg-accent-3);
+  box-shadow:
+    0 0 0 2px var(--pg-bg-0),
+    0 0 0 0 rgba(219, 39, 119, 0.55);
+  animation: pgLivePulse 1.8s ease-out infinite;
+}
+.pg-topbar.is-scrolled .pg-pill-new-dot {
+  box-shadow:
+    0 0 0 2px var(--pg-surface-elev),
+    0 0 0 0 rgba(219, 39, 119, 0.55);
+}
+
+.pg-wn-modal {
+  max-width: 640px;
+  text-align: left;
+  padding: 28px 0 0;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 40px);
+}
+.pg-wn-head {
+  padding: 0 28px 18px;
+  text-align: center;
+  border-bottom: 1px solid var(--pg-border);
+  position: relative;
+}
+.pg-wn-head .pg-modal-title {
+  margin-bottom: 6px;
+}
+.pg-wn-head .pg-modal-desc {
+  margin-bottom: 0;
+}
+
+.pg-wn-body {
+  padding: 22px 28px 8px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.pg-wn-version {
+  position: relative;
+}
+.pg-wn-version + .pg-wn-version {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--pg-border);
+}
+
+.pg-wn-vhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.pg-wn-vmeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.pg-wn-vtitle {
+  font-family: var(--pg-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--pg-text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.pg-wn-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--pg-gradient);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 14px -6px rgba(124, 58, 237, 0.6);
+}
+.pg-wn-vdate {
+  font-size: 12.5px;
+  color: var(--pg-text-mute);
+  font-variant-numeric: tabular-nums;
+}
+.pg-wn-highlight {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--pg-text);
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.08),
+    rgba(96, 165, 250, 0.06)
+  );
+  border: 1px solid rgba(124, 58, 237, 0.18);
+}
+
+.pg-wn-section + .pg-wn-section {
+  margin-top: 16px;
+}
+.pg-wn-section-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  border: 1px solid transparent;
+}
+.pg-wn-tag-added {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.28);
+  color: #15803d;
+}
+.pg-wn-tag-changed {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.30);
+  color: #b45309;
+}
+.pg-wn-tag-fixed {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.28);
+  color: #1d4ed8;
+}
+.pg-wn-tag-technical {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.28);
+  color: #6d28d9;
+}
+.pg-wn-tag-docs {
+  background: rgba(236, 72, 153, 0.12);
+  border-color: rgba(236, 72, 153, 0.28);
+  color: #be185d;
+}
+body[data-theme='dark'] .pg-wn-tag-added {
+  color: #4ade80;
+}
+body[data-theme='dark'] .pg-wn-tag-changed {
+  color: #fbbf24;
+}
+body[data-theme='dark'] .pg-wn-tag-fixed {
+  color: #60a5fa;
+}
+body[data-theme='dark'] .pg-wn-tag-technical {
+  color: #c4b5fd;
+}
+body[data-theme='dark'] .pg-wn-tag-docs {
+  color: #f9a8d4;
+}
+
+.pg-wn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-wn-item {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.25px;
+  line-height: 1.55;
+  color: var(--pg-text-soft);
+}
+.pg-wn-item::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--pg-accent);
+  opacity: 0.7;
+}
+
+.pg-wn-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 28px;
+  border-top: 1px solid var(--pg-border);
+  background: var(--pg-surface);
+  border-radius: 0 0 22px 22px;
+}
+
+@media (max-width: 520px) {
+  .pg-wn-modal {
+    max-height: calc(100vh - 24px);
+    border-radius: 18px;
+  }
+  .pg-wn-head,
+  .pg-wn-body,
+  .pg-wn-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .pg-wn-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    border-radius: 0 0 18px 18px;
+  }
+  .pg-wn-vhead {
+    gap: 8px;
+  }
 }
 
 /* =========================================================
