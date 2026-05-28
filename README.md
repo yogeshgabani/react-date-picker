@@ -36,6 +36,7 @@ DateTimePicker · DateTimeRangePicker
 - [Common props](#common-props)
 - [Date-picker props](#date-picker-props)
 - [Time-picker props](#time-picker-props)
+- [Custom format (Moment-style tokens)](#custom-format-moment-style-tokens)
 - [Theming](#theming)
 - [Dark mode](#dark-mode)
 - [Localization](#localization)
@@ -44,6 +45,7 @@ DateTimePicker · DateTimeRangePicker
 - [Headless hooks (advanced)](#headless-hooks-advanced)
 - [TypeScript types](#typescript-types)
 - [Browser support](#browser-support)
+- [Changelog](#changelog)
 - [License](#license)
 
 ---
@@ -288,7 +290,7 @@ Apply to `DatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker
 | `minDate` | `Date` | — | Earliest selectable date (inclusive). |
 | `maxDate` | `Date` | — | Latest selectable date (inclusive). |
 | `disabledDates` | `Date[] \| (d: Date) => boolean` | — | Disable individual dates or by predicate. |
-| `format` | `string` | locale default | A [`date-fns` format string](https://date-fns.org/v3.6.0/docs/format) for the input display. |
+| `format` | `string` | locale default | Display format string. Accepts both **Moment-style** tokens (`DD/MM/YYYY`, `dddd, D MMMM, YYYY`) and `date-fns` Unicode tokens. See [Custom format](#custom-format-moment-style-tokens). |
 | `weekStartsOn` | `0..6` | `0` (Sun) | First day of the week. |
 | `showWeekNumbers` | `boolean` | `false` | Show ISO-8601 week numbers in the calendar. |
 | `numberOfMonths` | `number` | `1` (range: `2`) | Months visible side-by-side. |
@@ -319,7 +321,95 @@ Apply to `TimePicker`, `TimeRangePicker`, `DateTimePicker`, `DateTimeRangePicker
 | `minuteStep` | `number` | `1` | Minute increments (e.g. `5`, `15`, `30`). |
 | `secondStep` | `number` | `1` | Second increments (only used when `showSeconds`). |
 | `showSeconds` | `boolean` | `false` | Show the seconds column. |
-| `format` | `string` | auto-derived | Custom `date-fns` format string for the input display. |
+| `format` | `string` | auto-derived | Custom format string for the input display — same token rules as [Custom format](#custom-format-moment-style-tokens). |
+
+---
+
+## Custom format (Moment-style tokens)
+
+The `format` prop controls how the selected date/time appears inside the
+input. You can pass either **Moment.js-style** tokens (the popular
+`DD/MM/YYYY` style most developers already know) or `date-fns` Unicode
+tokens — the library translates them internally.
+
+```tsx
+import { DatePicker } from 'react-datetime-kit';
+
+function Example() {
+  const [date, setDate] = useState<Date | null>(new Date());
+
+  return (
+    <DatePicker
+      value={date}
+      onChange={setDate}
+      format="DD/MM/YYYY"          // → 19/02/2026
+      // format="dddd, D MMMM, YYYY"  → Thursday, 19 February, 2026
+      // format="YYYY-MM-DD"          → 2026-02-19
+    />
+  );
+}
+```
+
+### Supported tokens
+
+| Token  | Output           | Example       |
+|--------|------------------|---------------|
+| `YYYY` | 4-digit year     | `2026`        |
+| `YY`   | 2-digit year     | `26`          |
+| `MMMM` | Full month name  | `February`    |
+| `MMM`  | Short month name | `Feb`         |
+| `MM`   | 2-digit month    | `02`          |
+| `M`    | 1–2 digit month  | `2`           |
+| `DD`   | 2-digit day      | `19`          |
+| `D`    | 1–2 digit day    | `19`          |
+| `dddd` | Full weekday     | `Thursday`    |
+| `ddd`  | Short weekday    | `Thu`         |
+| `HH`   | 2-digit hour 24h | `09`, `21`    |
+| `H`    | 1–2 digit hour 24h | `9`, `21`   |
+| `hh`   | 2-digit hour 12h | `09`          |
+| `h`    | 1–2 digit hour 12h | `9`         |
+| `mm`   | 2-digit minute   | `05`          |
+| `m`    | 1–2 digit minute | `5`           |
+| `ss`   | 2-digit second   | `07`          |
+| `s`    | 1–2 digit second | `7`           |
+| `A`    | AM/PM uppercase  | `PM`          |
+| `a`    | am/pm lowercase  | `pm`          |
+
+Separators — `/`, `-`, `.`, `_`, space, comma — are passed through
+as-is. Any other letters get treated as literals (e.g. `[on]` is not
+supported; just write `on` and it will appear verbatim).
+
+### Common format examples
+
+```tsx
+// Day · Month · Year
+<DatePicker format="D/M/YYYY" />              // 19/2/2026
+<DatePicker format="DD/MM/YYYY" />             // 19/02/2026
+<DatePicker format="DD-MM-YY" />               // 19-02-26
+<DatePicker format="DD.MM.YYYY" />             // 19.02.2026
+
+// Year · Month · Day (ISO / DB-friendly)
+<DatePicker format="YYYY/MM/DD" />             // 2026/02/19
+<DatePicker format="YYYY-MM-DD" />             // 2026-02-19
+
+// With month names
+<DatePicker format="D MMM YYYY" />             // 19 Feb 2026
+<DatePicker format="DD MMMM YYYY" />           // 19 February 2026
+<DatePicker format="D-MMM-YYYY" />             // 19-Feb-2026
+<DatePicker format="D MMM, YYYY" />            // 19 Feb, 2026
+
+// With weekday names
+<DatePicker format="dddd, D MMMM, YYYY" />     // Thursday, 19 February, 2026
+<DatePicker format="ddd, DD MMM YYYY" />       // Thu, 19 Feb 2026
+
+// DateTime
+<DateTimePicker format="DD/MM/YYYY HH:mm" />   // 19/02/2026 14:30
+<DateTimePicker format="D MMM YYYY, hh:mm A" />// 19 Feb 2026, 02:30 PM
+```
+
+> 💡 **Tip** — if you ever need it, the same translator is exported as
+> `normalizeFormat(fmt)` from `react-datetime-kit/utils` so you can
+> reuse it elsewhere in your app.
 
 ---
 
@@ -547,6 +637,27 @@ import type {
 ## Browser support
 
 Modern evergreen browsers (Chrome, Edge, Firefox, Safari — last two stable versions). Requires CSS `color-mix()` support for opacity-modifier utilities — Chrome 111+, Firefox 113+, Safari 16.4+.
+
+---
+
+## Changelog
+
+See **[CHANGELOG.md](./CHANGELOG.md)** for the full release history.
+
+### What's new in `1.0.0` 🎉
+
+First stable release. Highlights:
+
+- **6 picker components** sharing one API — `DatePicker`, `DateRangePicker`, `TimePicker`, `TimeRangePicker`, `DateTimePicker`, `DateTimeRangePicker`.
+- **Moment-style format tokens** — pass `DD/MM/YYYY`, `dddd, D MMMM, YYYY`, `hh:mm A` etc. and the library translates to `date-fns` internally. Existing `date-fns` formats keep working.
+- **CSS-variable theming** with built-in light / dark / auto modes that honor `prefers-color-scheme`.
+- **Accessibility built-in** — WAI-ARIA roles, full keyboard navigation, focus trap inside popovers, screen-reader labels.
+- **i18n + RTL** — full `date-fns` locale support, configurable `weekStartsOn`, `dir="rtl"` first-class.
+- **Headless hooks** — `useDatePicker`, `useDateRange`, `useTimePicker` for fully custom UIs.
+- **Range presets sidebar** — built-in defaults (Today, Last 7 days, This month, …) or pass your own.
+- **TypeScript-first**, tree-shakeable ESM + CJS, works with React 17 / 18 / 19.
+
+> Upgrading from a pre-release? There are no breaking changes — the public API has been stable, and `1.0.0` marks the semver commitment.
 
 ---
 

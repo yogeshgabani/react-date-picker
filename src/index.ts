@@ -26,6 +26,7 @@ export {
   defaultDateFormat,
   defaultTimeFormat,
   defaultDateTimeFormat,
+  normalizeFormat,
 } from './utils/format';
 export { parseDate, parseTime } from './utils/parse';
 export { isDateDisabled, clampDate } from './utils/constraints';

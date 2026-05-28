@@ -1,9 +1,11 @@
 import { parse as fnsParse, isValid } from 'date-fns';
 import type { Locale, TimeValue } from '../types';
+import { normalizeFormat } from './format';
 
 /**
  * Lenient date parser — tries the user-supplied format first, then a list of
- * common fallbacks. Returns null if nothing parses cleanly.
+ * common fallbacks. Returns null if nothing parses cleanly. Accepts both
+ * Moment-style (`DD/MM/YYYY`) and date-fns-style (`dd/MM/yyyy`) tokens.
  */
 export function parseDate(
   input: string,
@@ -12,7 +14,13 @@ export function parseDate(
 ): Date | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
-  const tries = [fmt, 'yyyy-MM-dd', 'MM/dd/yyyy', 'dd/MM/yyyy', 'MMM d, yyyy'];
+  const tries = [
+    normalizeFormat(fmt),
+    'yyyy-MM-dd',
+    'MM/dd/yyyy',
+    'dd/MM/yyyy',
+    'MMM d, yyyy',
+  ];
   const ref = new Date();
   for (const f of tries) {
     const d = fnsParse(trimmed, f, ref, locale ? { locale } : undefined);

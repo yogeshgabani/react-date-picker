@@ -11,6 +11,19 @@ html,
 body {
   margin: 0;
   padding: 0;
+  /* Lock both root elements to the viewport width. Without this the
+     browser can briefly fall back to intrinsic sizing when CSS with
+     wide content (e.g. <pre> code blocks, picker popovers measured
+     during Floating UI's first paint) loads before final layout — the
+     visual symptom is the page rendering in only the left half of the
+     viewport until a React re-render forces a reflow. */
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+#root {
+  width: 100%;
+  min-width: 0;
 }
 
 :root {
@@ -127,12 +140,23 @@ body[data-theme='dark']::before {
    ========================================================= */
 .pg-page {
   max-width: 1120px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
   padding: 32px 24px 80px;
 }
 
+.pg-stack {
+  min-width: 0;
+}
 .pg-stack > * + * {
   margin-top: 28px;
+}
+/* Block-level content (pre code blocks, tables) must never push the
+   page wider than its container. */
+.pg-stack > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* =========================================================
@@ -412,6 +436,113 @@ body[data-theme='dark'] .pg-brand-dots {
   background: var(--pg-surface-elev);
 }
 
+/* =========================================================
+   Custom format demo
+   ========================================================= */
+.pg-format-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+.pg-format-controls,
+.pg-format-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.pg-format-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pg-format-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pg-text-mute);
+}
+.pg-format-select,
+.pg-format-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pg-border-strong);
+  background: var(--pg-surface);
+  color: var(--pg-text);
+  font-family: var(--pg-mono);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.pg-format-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--pg-text-soft) 50%),
+                    linear-gradient(135deg, var(--pg-text-soft) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+  cursor: pointer;
+  color-scheme: light;
+}
+body[data-theme='dark'] .pg-format-select {
+  color-scheme: dark;
+}
+body[data-theme='dark'] .pg-format-select option,
+body[data-theme='dark'] .pg-format-select optgroup {
+  background: #1c1c26;
+  color: #f4f4f6;
+}
+body[data-theme='dark'] .pg-format-select optgroup {
+  color: #a78bfa;
+  font-weight: 700;
+}
+.pg-format-select:focus,
+.pg-format-input:focus {
+  border-color: var(--pg-accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+}
+.pg-format-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.08),
+    rgba(37, 99, 235, 0.06)
+  );
+  border: 1px dashed rgba(124, 58, 237, 0.3);
+}
+.pg-format-preview-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pg-text-mute);
+}
+.pg-format-preview-value {
+  font-family: var(--pg-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pg-accent);
+  background: transparent;
+  padding: 0;
+}
+
+@media (max-width: 720px) {
+  .pg-format-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
 .pg-section-label {
   display: inline-flex;
   align-items: center;
@@ -488,7 +619,7 @@ body[data-theme='dark'] .pg-brand-dots {
    ========================================================= */
 .pg-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -543,6 +674,48 @@ body[data-theme='dark'] .pg-brand-dots {
   color: var(--pg-text-soft);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.pg-demo-head-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.pg-demo-tweak {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.12),
+    rgba(37, 99, 235, 0.10)
+  );
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  color: var(--pg-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.pg-demo.is-clickable {
+  cursor: pointer;
+}
+.pg-demo.is-clickable:hover .pg-demo-tweak {
+  opacity: 1;
+  transform: translateX(0);
+}
+.pg-demo.is-clickable:focus-visible {
+  outline: none;
+  border-color: var(--pg-accent);
+  box-shadow:
+    0 0 0 3px rgba(124, 58, 237, 0.2),
+    var(--pg-shadow-md);
 }
 
 .pg-demo-body {
@@ -645,7 +818,7 @@ body[data-theme='dark'] .pg-brand-dots {
    ========================================================= */
 .pg-feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 14px;
 }
 .pg-feature {
@@ -881,6 +1054,220 @@ body[data-theme='dark'] .pg-footer-nav a:hover {
 }
 
 /* =========================================================
+   Footer stats (Last Updated / Hits / Visitors)
+   ========================================================= */
+/* Standalone stats strip below the footer card */
+.pg-stats-strip {
+  margin-top: 28px;
+  padding: 22px 24px;
+  border-top: 1px solid var(--pg-border-strong);
+  position: relative;
+}
+.pg-stats-strip::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0 auto 0;
+  height: 2px;
+  background: var(--pg-gradient-text);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.pg-stats-strip-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pg-stat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--pg-border);
+  background: var(--pg-surface-elev);
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease;
+}
+.pg-stat::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.25),
+    transparent 45%,
+    rgba(37, 99, 235, 0.18)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  pointer-events: none;
+}
+.pg-stat:hover {
+  transform: translateY(-2px);
+  border-color: var(--pg-border-strong);
+  box-shadow:
+    0 8px 22px -14px rgba(124, 58, 237, 0.45),
+    0 2px 6px -2px rgba(15, 23, 42, 0.08);
+}
+.pg-stat:hover::before {
+  opacity: 1;
+}
+
+.pg-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.12),
+    rgba(37, 99, 235, 0.10)
+  );
+  color: var(--pg-accent);
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.pg-stat-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.pg-stat:hover .pg-stat-icon {
+  transform: scale(1.06) rotate(-3deg);
+}
+
+.pg-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pg-stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pg-text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.pg-stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pg-text);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pg-stat-num {
+  font-family: var(--pg-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 17px;
+  letter-spacing: 0;
+}
+
+.pg-stat-highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.10),
+    rgba(37, 99, 235, 0.06) 60%,
+    rgba(219, 39, 119, 0.08)
+  );
+  border-color: rgba(124, 58, 237, 0.22);
+}
+.pg-stat-highlight .pg-stat-icon {
+  background: var(--pg-gradient);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 16px -8px rgba(124, 58, 237, 0.55);
+}
+.pg-stat-highlight .pg-stat-value {
+  background: var(--pg-gradient-text);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.pg-stat-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.pg-stat-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: pgLivePulse 1.6s ease-out infinite;
+}
+@keyframes pgLivePulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+body[data-theme='dark'] .pg-stat {
+  background: rgba(255, 255, 255, 0.04);
+}
+body[data-theme='dark'] .pg-stat-icon {
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.18),
+    rgba(96, 165, 250, 0.12)
+  );
+  border-color: rgba(167, 139, 250, 0.25);
+}
+body[data-theme='dark'] .pg-stat-highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.16),
+    rgba(96, 165, 250, 0.08) 60%,
+    rgba(244, 114, 182, 0.12)
+  );
+  border-color: rgba(167, 139, 250, 0.28);
+}
+body[data-theme='dark'] .pg-stat-live {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.32);
+}
+body[data-theme='dark'] .pg-stat:hover {
+  box-shadow:
+    0 10px 26px -14px rgba(167, 139, 250, 0.55),
+    0 2px 6px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================================================
    Scroll-to-top floating button
    ========================================================= */
 .pg-to-top {
@@ -1066,6 +1453,912 @@ body[data-theme='dark'] .pg-footer-nav a:hover {
 }
 
 /* =========================================================
+   Footer social row (Connect with Yogesh)
+   ========================================================= */
+.pg-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pg-footer-social-text {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.pg-footer-social-title {
+  font-weight: 700;
+  background: var(--pg-gradient-text);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  letter-spacing: -0.005em;
+}
+.pg-footer-social-sep {
+  color: var(--pg-text-mute);
+  opacity: 0.6;
+}
+.pg-footer-social-tag {
+  color: var(--pg-text-soft);
+}
+
+.pg-footer-social-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pg-social-icon {
+  --pg-social-brand: var(--pg-accent);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--pg-surface-elev);
+  border: 1px solid var(--pg-border-strong);
+  color: var(--pg-text-soft);
+  text-decoration: none;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+  overflow: hidden;
+}
+.pg-social-icon svg {
+  width: 16px;
+  height: 16px;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.22s ease;
+}
+.pg-social-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--pg-social-brand);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.pg-social-icon:hover {
+  transform: translateY(-3px) scale(1.06);
+  color: #fff;
+  border-color: var(--pg-social-brand);
+  box-shadow: 0 8px 20px -8px var(--pg-social-brand);
+}
+.pg-social-icon:hover::before {
+  opacity: 1;
+  transform: scale(1.05);
+}
+.pg-social-icon:hover svg {
+  transform: scale(1.1);
+}
+.pg-social-icon:active {
+  transform: translateY(-1px) scale(1.02);
+}
+.pg-social-icon:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(124, 58, 237, 0.25),
+    0 8px 20px -8px var(--pg-social-brand);
+}
+
+/* Special: X/Twitter — invert per theme so the glyph stays readable */
+.pg-social-twitter {
+  --pg-social-brand: #000000;
+}
+body[data-theme='dark'] .pg-social-twitter {
+  --pg-social-brand: #ffffff;
+  color: #f4f4f6;
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+}
+body[data-theme='dark'] .pg-social-twitter.is-empty {
+  color: #f4f4f6;
+  opacity: 1;
+}
+body[data-theme='dark'] .pg-social-twitter:hover {
+  color: #000;
+  background: #fff;
+  border-color: #fff;
+  box-shadow: 0 8px 20px -8px rgba(255, 255, 255, 0.45);
+}
+
+/* Empty (coming soon) icons rest slightly dimmed but light up in brand color on hover */
+.pg-social-icon.is-empty {
+  cursor: pointer;
+  opacity: 0.78;
+}
+.pg-social-icon.is-empty:hover {
+  opacity: 1;
+}
+
+/* =========================================================
+   Coming Soon modal
+   ========================================================= */
+.pg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 15, 25, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: pgModalFadeIn 0.22s ease-out;
+}
+body[data-theme='dark'] .pg-modal-overlay {
+  background: rgba(0, 0, 0, 0.65);
+}
+@keyframes pgModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pg-modal {
+  --pg-social-brand: var(--pg-accent);
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 28px 26px;
+  border-radius: 22px;
+  background: var(--pg-surface-elev);
+  border: 1px solid var(--pg-border-strong);
+  text-align: center;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.1),
+    0 30px 70px -20px rgba(15, 23, 42, 0.45),
+    0 50px 120px -30px var(--pg-social-brand);
+  animation: pgModalPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+@keyframes pgModalPop {
+  from { opacity: 0; transform: translateY(12px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pg-modal-glow {
+  position: absolute;
+  inset: -40% -10% auto -10%;
+  height: 60%;
+  background: radial-gradient(
+    closest-side,
+    var(--pg-social-brand) 0%,
+    transparent 70%
+  );
+  opacity: 0.18;
+  pointer-events: none;
+  filter: blur(20px);
+}
+
+.pg-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--pg-text-mute);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.pg-modal-close svg {
+  width: 16px;
+  height: 16px;
+}
+.pg-modal-close:hover {
+  background: var(--pg-surface);
+  color: var(--pg-text);
+  transform: rotate(90deg);
+}
+
+.pg-modal-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  background: var(--pg-social-brand);
+  color: #fff;
+  box-shadow:
+    0 12px 30px -10px var(--pg-social-brand),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  animation: pgModalFloat 3.2s ease-in-out infinite;
+}
+.pg-modal-icon svg {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  z-index: 1;
+}
+@keyframes pgModalFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.pg-modal-icon-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 28px;
+  border: 2px solid var(--pg-social-brand);
+  opacity: 0.4;
+  animation: pgRingPulse 2s ease-out infinite;
+}
+@keyframes pgRingPulse {
+  0% { transform: scale(0.92); opacity: 0.5; }
+  70% { transform: scale(1.15); opacity: 0; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+
+body[data-theme='dark'] .pg-modal-icon.pg-social-twitter {
+  background: #fff;
+  color: #000;
+}
+body[data-theme='dark'] .pg-modal-icon.pg-social-twitter .pg-modal-icon-ring {
+  border-color: #fff;
+}
+
+.pg-modal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.12),
+    rgba(219, 39, 119, 0.10)
+  );
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  color: var(--pg-accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  position: relative;
+}
+.pg-modal-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--pg-accent-3);
+  box-shadow: 0 0 0 0 rgba(219, 39, 119, 0.6);
+  animation: pgLivePulse 1.6s ease-out infinite;
+}
+
+.pg-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--pg-text);
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  position: relative;
+}
+
+.pg-modal-desc {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--pg-text-soft);
+  margin: 0 0 22px;
+  position: relative;
+}
+
+.pg-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.pg-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+.pg-modal-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.pg-modal-btn-ghost {
+  background: transparent;
+  border-color: var(--pg-border-strong);
+  color: var(--pg-text);
+}
+.pg-modal-btn-ghost:hover {
+  background: var(--pg-surface);
+  transform: translateY(-1px);
+}
+.pg-modal-btn-primary {
+  background: var(--pg-gradient);
+  color: #fff;
+  box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.55);
+}
+.pg-modal-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px -10px rgba(124, 58, 237, 0.7);
+}
+
+body[data-theme='dark'] .pg-modal {
+  background: rgba(28, 28, 36, 0.92);
+}
+
+/* =========================================================
+   Customizer modal (per-card prop playground)
+   ========================================================= */
+/* Library popovers (calendar / time panels) portal to document.body
+   via Floating UI and use `rdk-z-50` (z-index: 50). In-app overlays
+   like the Coming Soon modal (z-100) and Customizer modal (z-100)
+   would otherwise render *above* them. The portal wrapper has no
+   positioning of its own — z-index must go on the absolutely-
+   positioned floating element inside it. */
+[data-floating-ui-portal] .rdk-z-50,
+[data-floating-ui-portal] > * {
+  z-index: 200;
+}
+
+.pg-cz-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 15, 25, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: pgModalFadeIn 0.22s ease-out;
+}
+body[data-theme='dark'] .pg-cz-overlay {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.pg-cz {
+  position: relative;
+  width: 100%;
+  max-width: 1240px;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  background: var(--pg-surface-elev);
+  border: 1px solid var(--pg-border-strong);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.1),
+    0 30px 80px -20px rgba(15, 23, 42, 0.5),
+    0 60px 140px -30px rgba(124, 58, 237, 0.35);
+  overflow: hidden;
+  animation: pgModalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+body[data-theme='dark'] .pg-cz {
+  background: rgba(22, 22, 30, 0.96);
+}
+.pg-cz::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--pg-gradient-text);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.pg-cz-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--pg-border);
+  flex-shrink: 0;
+}
+.pg-cz-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pg-text);
+  letter-spacing: -0.01em;
+}
+.pg-cz-sub {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--pg-mono);
+  font-size: 12px;
+  color: var(--pg-text-mute);
+}
+.pg-cz-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--pg-border);
+  background: var(--pg-surface);
+  color: var(--pg-text-soft);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.pg-cz-close:hover {
+  background: var(--pg-surface-elev);
+  color: var(--pg-text);
+  transform: rotate(90deg);
+}
+
+/* Controls grid */
+.pg-cz-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 18px;
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--pg-border);
+}
+.pg-cz-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.pg-cz-field.is-wide {
+  grid-column: span 2;
+}
+.pg-cz-field-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--pg-text-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pg-cz-field-control {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  /* Allow flex/grid children to actually shrink to their parent cell
+     instead of being sized by their content's min-content. Without
+     this the placeholder text on inputs pushes the cell wider and
+     overflows the modal on small screens. */
+  min-width: 0;
+  width: 100%;
+}
+
+/* Button group */
+.pg-cz-btngroup {
+  display: inline-flex;
+  border-radius: 10px;
+  border: 1px solid var(--pg-border-strong);
+  background: var(--pg-surface);
+  padding: 3px;
+  gap: 2px;
+  max-width: 100%;
+}
+.pg-cz-btn {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 0;
+  background: transparent;
+  color: var(--pg-text-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.pg-cz-btn:hover {
+  color: var(--pg-text);
+}
+.pg-cz-btn.is-active {
+  background: var(--pg-gradient);
+  color: #fff;
+  box-shadow: 0 4px 12px -6px rgba(124, 58, 237, 0.55);
+}
+
+/* Toggle switch */
+.pg-cz-toggle {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--pg-border-strong);
+  background: var(--pg-surface);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.22s ease, border-color 0.22s ease;
+}
+.pg-cz-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+body[data-theme='dark'] .pg-cz-toggle-thumb {
+  background: #e4e4e9;
+}
+.pg-cz-toggle.is-on {
+  background: var(--pg-gradient);
+  border-color: transparent;
+}
+.pg-cz-toggle.is-on .pg-cz-toggle-thumb {
+  transform: translateX(18px);
+  background: #fff;
+}
+
+/* Inputs / selects */
+.pg-cz-input,
+.pg-cz-select {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--pg-border-strong);
+  background: var(--pg-surface);
+  color: var(--pg-text);
+  font-family: var(--pg-mono);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.pg-cz-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--pg-text-soft) 50%),
+                    linear-gradient(135deg, var(--pg-text-soft) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 30px;
+  /* Hint browser/OS the control is dark in dark mode so the native
+     option list inherits a readable color scheme. */
+  color-scheme: light;
+}
+body[data-theme='dark'] .pg-cz-select {
+  color-scheme: dark;
+}
+/* Native <option>s render via the OS — we can only style background
+   and color. Make them legible in dark mode. */
+body[data-theme='dark'] .pg-cz-select option,
+body[data-theme='dark'] .pg-cz-select optgroup {
+  background: #1c1c26;
+  color: #f4f4f6;
+}
+body[data-theme='dark'] .pg-cz-select optgroup {
+  color: #a78bfa;
+  font-weight: 700;
+}
+.pg-cz-input:focus,
+.pg-cz-select:focus {
+  border-color: var(--pg-accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+}
+.pg-cz-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.pg-cz-row > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Range slider */
+.pg-cz-range {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--pg-border-strong);
+  outline: none;
+}
+.pg-cz-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pg-gradient);
+  cursor: pointer;
+  border: 2px solid var(--pg-surface-elev);
+  box-shadow: 0 2px 6px -1px rgba(124, 58, 237, 0.5);
+}
+.pg-cz-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #7c3aed;
+  cursor: pointer;
+  border: 2px solid var(--pg-surface-elev);
+}
+
+/* Output area: code + preview */
+.pg-cz-output {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px 24px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+.pg-cz-panel {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  border: 1px solid var(--pg-border);
+  background: var(--pg-surface);
+  overflow: hidden;
+  min-width: 0;
+}
+.pg-cz-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--pg-border);
+  background: var(--pg-surface-elev);
+}
+.pg-cz-panel-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--pg-text-mute);
+}
+.pg-cz-copy {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--pg-gradient);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 4px 12px -6px rgba(124, 58, 237, 0.55);
+}
+.pg-cz-copy:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -8px rgba(124, 58, 237, 0.7);
+}
+.pg-cz-copy.is-copied {
+  background: #10b981;
+  box-shadow: 0 4px 12px -6px rgba(16, 185, 129, 0.6);
+}
+
+.pg-cz-code-panel {
+  background: #0f0f17;
+  border-color: transparent;
+}
+body[data-theme='light'] .pg-cz-code-panel {
+  background: #1a1a26;
+}
+.pg-cz-code-panel .pg-cz-panel-head {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.pg-cz-code-panel .pg-cz-panel-label {
+  color: #777783;
+}
+.pg-cz-code {
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  font-family: var(--pg-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #d4d4dc;
+  flex: 1;
+}
+.pg-cz-code code {
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+.pg-cz-preview-panel {
+  background: var(--pg-surface);
+}
+.pg-cz-preview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
+  min-height: 220px;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 14px,
+      rgba(124, 58, 237, 0.04) 14px 15px
+    );
+}
+
+.pg-cz-foot {
+  padding: 12px 24px 16px;
+  border-top: 1px solid var(--pg-border);
+  text-align: center;
+  font-size: 12px;
+  color: var(--pg-text-mute);
+  flex-shrink: 0;
+}
+.pg-cz-foot kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 2px;
+  border-radius: 5px;
+  border: 1px solid var(--pg-border-strong);
+  background: var(--pg-surface);
+  color: var(--pg-text-soft);
+  font-family: var(--pg-mono);
+  font-size: 10.5px;
+  box-shadow: inset 0 -1px 0 var(--pg-border-strong);
+}
+
+@media (max-width: 960px) {
+  .pg-cz-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pg-cz-output {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablet / large phone — switch to single-scroll layout so the
+   user can flow through controls → code → preview without
+   wrestling nested scrollers. */
+@media (max-width: 720px) {
+  .pg-cz-overlay {
+    padding: 10px;
+  }
+  .pg-cz {
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .pg-cz-head {
+    padding: 16px 16px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--pg-surface-elev);
+  }
+  body[data-theme='dark'] .pg-cz-head {
+    background: rgba(22, 22, 30, 0.96);
+  }
+  .pg-cz-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px;
+    gap: 14px 12px;
+    overflow: visible;
+    flex: 0 0 auto;
+  }
+  /* On mobile each section should use its natural content height so
+     the whole modal scrolls as one page. The desktop `flex: 1 1 auto`
+     plus `min-height: 0` collapsed the output to 0 height, hiding
+     the Code + Live Preview panels entirely. */
+  .pg-cz-output {
+    padding: 16px;
+    overflow: visible;
+    gap: 14px;
+    flex: 0 0 auto;
+    min-height: auto;
+  }
+  .pg-cz-code {
+    max-height: 260px;
+  }
+  .pg-cz-foot {
+    padding: 12px 16px 14px;
+  }
+  /* Format row: stack select + custom input vertically — both
+     get full width and stay readable. */
+  .pg-cz-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .pg-cz-title {
+    font-size: 16px;
+  }
+  .pg-cz-code {
+    font-size: 11.5px;
+    padding: 14px;
+  }
+  .pg-cz-preview {
+    min-height: 160px;
+    padding: 22px 16px;
+  }
+}
+
+/* Small phones — keep 2-column grid for narrow controls (toggles
+   are tiny so space stays usable), tighter spacing. */
+@media (max-width: 480px) {
+  .pg-cz-controls {
+    padding: 14px;
+    gap: 12px 10px;
+  }
+  .pg-cz-head,
+  .pg-cz-output,
+  .pg-cz-foot {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .pg-cz-btngroup {
+    flex-wrap: wrap;
+  }
+  .pg-cz-btn {
+    padding: 6px 10px;
+    font-size: 11.5px;
+  }
+  .pg-cz-input,
+  .pg-cz-select {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+  .pg-cz-close {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* Very small phones — finally fall back to a single column once we
+   can no longer fit two reasonable fields side by side. */
+@media (max-width: 360px) {
+  .pg-cz-controls {
+    grid-template-columns: 1fr;
+  }
+  .pg-cz-field.is-wide {
+    grid-column: span 1;
+  }
+}
+
+/* =========================================================
    Responsive
    ========================================================= */
 
@@ -1074,12 +2367,17 @@ body[data-theme='dark'] .pg-footer-nav a:hover {
   .pg-section-title {
     font-size: 20px;
   }
+  /* Cap the minmax min at 100% of the container so the column shrinks
+     with the viewport instead of overflowing (or leaving a phantom
+     empty track) when the screen is narrower than the requested min.
+     Also use auto-fit (not auto-fill) so any remaining empty tracks
+     collapse and the visible item expands to fill the row. */
   .pg-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 14px;
   }
   .pg-feature-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   }
 }
 
@@ -1218,10 +2516,59 @@ body[data-theme='dark'] .pg-footer-nav a:hover {
     width: 100%;
     justify-content: flex-start;
   }
+  .pg-stats-strip {
+    margin-top: 22px;
+    padding: 18px 18px 30px;
+  }
+  .pg-stats-strip-inner {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .pg-stat {
+    padding: 12px 14px;
+  }
+  .pg-stat-value {
+    font-size: 15px;
+  }
+  .pg-stat-num {
+    font-size: 16px;
+  }
+  .pg-footer-social {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .pg-footer-social-icons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .pg-social-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .pg-modal {
+    padding: 26px 20px 22px;
+    border-radius: 18px;
+  }
+  .pg-modal-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 14px;
+  }
+  .pg-modal-title {
+    font-size: 18px;
+  }
 }
 
-/* Very small phones */
+/* Very small phones — squeeze every pixel of horizontal space so
+   content fills the viewport, not the dev-tools-emulated frame. */
 @media (max-width: 380px) {
+  .pg-page {
+    padding: 16px 12px 48px;
+  }
+  .pg-topbar-inner {
+    padding: 0 12px;
+  }
   .pg-pill {
     padding: 6px 10px;
     font-size: 11.5px;
@@ -1235,5 +2582,30 @@ body[data-theme='dark'] .pg-footer-nav a:hover {
   }
   .pg-brand-name {
     font-size: 12px;
+  }
+  .pg-brand {
+    padding: 4px 10px 4px 4px;
+    gap: 8px;
+  }
+  .pg-brand-dots {
+    padding: 6px 9px;
+    gap: 4px;
+  }
+  .pg-card {
+    padding: 14px;
+    border-radius: 12px;
+  }
+  .pg-feature {
+    padding: 12px;
+  }
+  .pg-snippet {
+    font-size: 11px;
+    padding: 10px 12px;
+  }
+  .pg-stats-strip {
+    padding: 14px 12px 24px;
+  }
+  .pg-footer {
+    padding: 20px 14px 18px;
   }
 }
