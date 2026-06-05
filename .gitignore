@@ -4,10 +4,8 @@ dist-site
 .netlify
 .DS_Store
 *.log
-.env
-.env.local
 coverage
-.vscode
 .idea
 *.tsbuildinfo
 *.tgz
+config.bat

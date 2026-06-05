@@ -8,6 +8,7 @@ import { usePopoverTrigger } from '../../hooks/usePopoverTrigger';
 import { formatTime } from '../../utils/format';
 import { parseTime } from '../../utils/parse';
 import { cn } from '../../utils/cn';
+import { colorsToCssVars } from '../../utils/colors';
 import type { TimePickerProps, TimeValue } from '../../types';
 
 export function TimePicker(props: TimePickerProps) {
@@ -26,6 +27,7 @@ export function TimePicker(props: TimePickerProps) {
     inline,
     size = 'md',
     theme,
+    colors,
     dir,
     className,
     inputClassName,
@@ -33,6 +35,8 @@ export function TimePicker(props: TimePickerProps) {
     id,
     name,
     autoFocus,
+    showIcon = true,
+    iconPosition = 'left',
   } = props;
 
   const ctrl = useTimePicker({ value, defaultValue, onChange });
@@ -47,6 +51,7 @@ export function TimePicker(props: TimePickerProps) {
 
   const themeAttr =
     theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
+  const colorStyle = colorsToCssVars(colors);
 
   const currentTime: TimeValue = ctrl.value ?? { hours: 0, minutes: 0, seconds: 0 };
 
@@ -67,6 +72,7 @@ export function TimePicker(props: TimePickerProps) {
         ref={wrapperRef}
         data-rdk-theme={themeAttr}
         dir={dir}
+        style={colorStyle}
         className={cn(
           'rdk-inline-block rdk-bg-rdk-surface rdk-text-rdk-text rdk-border rdk-border-rdk-border rdk-rounded-rdk-lg rdk-shadow-rdk rdk-font-rdk rdk-overflow-hidden',
           className,
@@ -82,6 +88,7 @@ export function TimePicker(props: TimePickerProps) {
       ref={wrapperRef}
       data-rdk-theme={themeAttr}
       dir={dir}
+      style={colorStyle}
       className={cn('rdk-inline-block rdk-w-full rdk-font-rdk', className)}
     >
       <PickerInput
@@ -93,7 +100,8 @@ export function TimePicker(props: TimePickerProps) {
         readOnly={readOnly}
         clearable={clearable}
         hasValue={!!ctrl.value}
-        icon={<ClockIcon />}
+        icon={showIcon ? <ClockIcon /> : undefined}
+        iconPosition={iconPosition}
         placeholder={placeholder}
         autoFocus={autoFocus}
         className={inputClassName}
@@ -113,7 +121,7 @@ export function TimePicker(props: TimePickerProps) {
         anchorRef={wrapperRef}
         className={popoverClassName}
       >
-        <div data-rdk-theme={themeAttr}>
+        <div data-rdk-theme={themeAttr} style={colorStyle}>
           {panel}
           <div className="rdk-flex rdk-items-center rdk-justify-end rdk-gap-2 rdk-px-3 rdk-py-2 rdk-border-t rdk-border-rdk-border">
             <button

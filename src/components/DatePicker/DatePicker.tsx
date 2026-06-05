@@ -10,6 +10,8 @@ import { usePopoverTrigger } from '../../hooks/usePopoverTrigger';
 import { formatDate, defaultDateFormat } from '../../utils/format';
 import { parseDate } from '../../utils/parse';
 import { cn } from '../../utils/cn';
+import { colorsToCssVars } from '../../utils/colors';
+import { effectiveDateBounds } from '../../utils/constraints';
 import type { DatePickerProps } from '../../types';
 
 export function DatePicker(props: DatePickerProps) {
@@ -29,6 +31,7 @@ export function DatePicker(props: DatePickerProps) {
     inline,
     size = 'md',
     theme,
+    colors,
     dir,
     weekStartsOn = 0,
     showWeekNumbers,
@@ -40,14 +43,28 @@ export function DatePicker(props: DatePickerProps) {
     id,
     name,
     autoFocus,
+    showIcon = true,
+    iconPosition = 'left',
+    view = 'day',
+    headerPosition = 'top',
+    closeOnSelect = true,
+    disablePast,
+    disableFuture,
   } = props;
+
+  const { minDate: effMin, maxDate: effMax } = effectiveDateBounds({
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+  });
 
   const ctrl = useDatePicker({
     value,
     defaultValue,
     onChange,
-    minDate,
-    maxDate,
+    minDate: effMin,
+    maxDate: effMax,
     disabledDates,
   });
 
@@ -64,7 +81,7 @@ export function DatePicker(props: DatePickerProps) {
     if (ctrl.isDisabled(d)) return;
     ctrl.setValue(d);
     ctrl.setFocusedDate(d);
-    if (!inline) setOpen(false);
+    if (!inline && closeOnSelect) setOpen(false);
   };
 
   const handleKeyDown = useCalendarKeyboard({
@@ -75,6 +92,7 @@ export function DatePicker(props: DatePickerProps) {
 
   const themeAttr =
     theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
+  const colorStyle = colorsToCssVars(colors);
 
   const calendarNode = (
     <div
@@ -97,24 +115,41 @@ export function DatePicker(props: DatePickerProps) {
         isDisabled={ctrl.isDisabled}
         onDayClick={commitDay}
         renderDay={renderDay}
+        view={view}
+        headerPosition={headerPosition}
       />
-      <FooterActions
-        onToday={() => {
-          const t = new Date();
-          if (ctrl.isDisabled(t)) return;
-          ctrl.setValue(t);
-          ctrl.setFocusedDate(t);
-          if (!inline) setOpen(false);
-        }}
-        onClear={
-          clearable
-            ? () => {
-                ctrl.setValue(null);
-                if (!inline) setOpen(false);
-              }
-            : undefined
-        }
-      />
+      {view === 'day' ? (
+        <FooterActions
+          onToday={() => {
+            const t = new Date();
+            if (ctrl.isDisabled(t)) return;
+            ctrl.setValue(t);
+            ctrl.setFocusedDate(t);
+            if (!inline && closeOnSelect) setOpen(false);
+          }}
+          onClear={
+            clearable
+              ? () => {
+                  ctrl.setValue(null);
+                  if (!inline && closeOnSelect) setOpen(false);
+                }
+              : undefined
+          }
+        />
+      ) : clearable ? (
+        <FooterActions
+          onToday={() => {
+            const t = new Date();
+            if (ctrl.isDisabled(t)) return;
+            ctrl.setValue(t);
+            if (!inline && closeOnSelect) setOpen(false);
+          }}
+          onClear={() => {
+            ctrl.setValue(null);
+            if (!inline && closeOnSelect) setOpen(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 
@@ -124,6 +159,7 @@ export function DatePicker(props: DatePickerProps) {
         ref={wrapperRef}
         data-rdk-theme={themeAttr}
         dir={dir}
+        style={colorStyle}
         className={cn(
           'rdk-inline-block rdk-bg-rdk-surface rdk-text-rdk-text rdk-border rdk-border-rdk-border rdk-rounded-rdk-lg rdk-shadow-rdk rdk-font-rdk rdk-overflow-hidden',
           className,
@@ -139,6 +175,7 @@ export function DatePicker(props: DatePickerProps) {
       ref={wrapperRef}
       data-rdk-theme={themeAttr}
       dir={dir}
+      style={colorStyle}
       className={cn('rdk-inline-block rdk-w-full rdk-font-rdk', className)}
     >
       <PickerInput
@@ -150,7 +187,8 @@ export function DatePicker(props: DatePickerProps) {
         readOnly={readOnly}
         clearable={clearable}
         hasValue={!!ctrl.value}
-        icon={<CalendarIcon />}
+        icon={showIcon ? <CalendarIcon /> : undefined}
+        iconPosition={iconPosition}
         placeholder={placeholder}
         autoFocus={autoFocus}
         className={inputClassName}
@@ -176,7 +214,7 @@ export function DatePicker(props: DatePickerProps) {
         anchorRef={wrapperRef}
         className={popoverClassName}
       >
-        <div data-rdk-theme={themeAttr}>{calendarNode}</div>
+        <div data-rdk-theme={themeAttr} style={colorStyle}>{calendarNode}</div>
       </Popover>
     </div>
   );

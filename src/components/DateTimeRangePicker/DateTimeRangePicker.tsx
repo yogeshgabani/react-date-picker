@@ -18,6 +18,8 @@ import { usePopoverTrigger } from '../../hooks/usePopoverTrigger';
 import { formatDate, defaultDateTimeFormat } from '../../utils/format';
 import { DEFAULT_PRESETS } from '../../utils/presets';
 import { cn } from '../../utils/cn';
+import { colorsToCssVars } from '../../utils/colors';
+import { effectiveDateBounds } from '../../utils/constraints';
 import type {
   DateRange,
   DateTimeRangePickerProps,
@@ -41,6 +43,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
     inline,
     size = 'md',
     theme,
+    colors,
     dir,
     weekStartsOn = 0,
     showWeekNumbers,
@@ -58,14 +61,26 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
     autoFocus,
     presets,
     showDefaultPresets,
+    showIcon = true,
+    iconPosition = 'left',
+    headerPosition = 'top',
+    disablePast,
+    disableFuture,
   } = props;
+
+  const { minDate: effMin, maxDate: effMax } = effectiveDateBounds({
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+  });
 
   const ctrl = useDateRange({
     value: value as DateRange | undefined,
     defaultValue: defaultValue as DateRange | undefined,
     onChange: (r) => onChange?.(r),
-    minDate,
-    maxDate,
+    minDate: effMin,
+    maxDate: effMax,
     disabledDates,
   });
 
@@ -75,6 +90,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
 
   const themeAttr =
     theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
+  const colorStyle = colorsToCssVars(colors);
 
   const fullFormat = fmt ?? defaultDateTimeFormat(hourFormat, showSeconds);
   const text = formatRange(ctrl.value, fullFormat, locale);
@@ -144,6 +160,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
             if (ctrl.selectionStep === 'end') ctrl.setHoverDate(d);
           }}
           renderDay={renderDay}
+          headerPosition={headerPosition}
         />
         <div className="rdk-flex rdk-items-stretch rdk-divide-x rdk-divide-rdk-border rdk-border-t rdk-border-rdk-border">
           <div className="rdk-flex-1">
@@ -207,6 +224,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
         ref={wrapperRef}
         data-rdk-theme={themeAttr}
         dir={dir}
+        style={colorStyle}
         className={cn(
           'rdk-inline-block rdk-bg-rdk-surface rdk-text-rdk-text rdk-border rdk-border-rdk-border rdk-rounded-rdk-lg rdk-shadow-rdk rdk-font-rdk rdk-overflow-hidden',
           className,
@@ -222,6 +240,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
       ref={wrapperRef}
       data-rdk-theme={themeAttr}
       dir={dir}
+      style={colorStyle}
       className={cn('rdk-inline-block rdk-w-full rdk-font-rdk', className)}
     >
       <PickerInput
@@ -233,7 +252,8 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
         readOnly
         clearable={clearable}
         hasValue={!!ctrl.value.start}
-        icon={<CalendarIcon />}
+        icon={showIcon ? <CalendarIcon /> : undefined}
+        iconPosition={iconPosition}
         placeholder={placeholder}
         autoFocus={autoFocus}
         className={inputClassName}
@@ -248,7 +268,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
         anchorRef={wrapperRef}
         className={popoverClassName}
       >
-        <div data-rdk-theme={themeAttr}>{panel}</div>
+        <div data-rdk-theme={themeAttr} style={colorStyle}>{panel}</div>
       </Popover>
     </div>
   );

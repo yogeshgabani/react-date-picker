@@ -33,6 +33,10 @@
   --rdk-shadow-lg: 0 24px 56px -16px rgba(124, 58, 237, 0.22),
     0 12px 24px -8px rgba(24, 24, 27, 0.08),
     0 0 0 1px rgba(124, 58, 237, 0.06);
+
+  --rdk-scroll-track: rgba(124, 58, 237, 0.04);
+  --rdk-scroll-thumb: rgba(124, 58, 237, 0.32);
+  --rdk-scroll-thumb-hover: rgba(124, 58, 237, 0.55);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -49,6 +53,10 @@
     --rdk-color-border-strong: #3f3f46;
     --rdk-color-disabled: #3f3f46;
     --rdk-color-range-bg: #2e1065;
+
+    --rdk-scroll-track: rgba(167, 139, 250, 0.04);
+    --rdk-scroll-thumb: rgba(167, 139, 250, 0.28);
+    --rdk-scroll-thumb-hover: rgba(167, 139, 250, 0.55);
   }
 }
 
@@ -65,6 +73,10 @@
   --rdk-color-border-strong: #3f3f46;
   --rdk-color-disabled: #3f3f46;
   --rdk-color-range-bg: #2e1065;
+
+  --rdk-scroll-track: rgba(167, 139, 250, 0.04);
+  --rdk-scroll-thumb: rgba(167, 139, 250, 0.28);
+  --rdk-scroll-thumb-hover: rgba(167, 139, 250, 0.55);
 }
 
 /* ============================================================
@@ -115,13 +127,62 @@
   border: 0;
 }
 
-/* Custom scrollbar for time columns */
+/* ============================================================
+   Themed scrollbars — scoped strictly to picker descendants
+   (anything inside an element carrying the `data-rdk-theme`
+   attribute). The library never styles host-page scrollbars,
+   so apps that mount the picker don't see any global leakage.
+   ============================================================ */
+
+/* Firefox */
+[data-rdk-theme] *,
+[data-rdk-theme] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rdk-scroll-thumb) var(--rdk-scroll-track);
+}
+
+/* WebKit / Blink (Chrome, Edge, Safari) */
+[data-rdk-theme] *::-webkit-scrollbar,
+[data-rdk-theme]::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+[data-rdk-theme] *::-webkit-scrollbar-track,
+[data-rdk-theme]::-webkit-scrollbar-track {
+  background: var(--rdk-scroll-track);
+  border-radius: 999px;
+}
+[data-rdk-theme] *::-webkit-scrollbar-thumb,
+[data-rdk-theme]::-webkit-scrollbar-thumb {
+  background: var(--rdk-scroll-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+[data-rdk-theme] *::-webkit-scrollbar-thumb:hover,
+[data-rdk-theme]::-webkit-scrollbar-thumb:hover {
+  background: var(--rdk-scroll-thumb-hover);
+  background-clip: padding-box;
+}
+[data-rdk-theme] *::-webkit-scrollbar-corner,
+[data-rdk-theme]::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Time columns are narrow — render a tighter 6px scrollbar
+   inside them so the thumb doesn't dominate the column. */
 .rdk-time-col::-webkit-scrollbar {
   width: 6px;
 }
 .rdk-time-col::-webkit-scrollbar-thumb {
-  background: var(--rdk-color-border-strong);
+  background: var(--rdk-scroll-thumb);
+  border: 0;
+  background-clip: padding-box;
   border-radius: 3px;
+}
+.rdk-time-col::-webkit-scrollbar-thumb:hover {
+  background: var(--rdk-scroll-thumb-hover);
 }
 .rdk-time-col::-webkit-scrollbar-track {
   background: transparent;

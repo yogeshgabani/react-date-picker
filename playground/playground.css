@@ -96,6 +96,67 @@ body {
   overflow-x: clip;
 }
 
+/* =========================================================
+   Themed scrollbars — apply globally so every scroll surface
+   (page, modal panels, code blocks, controls grid) matches
+   the playground's purple/violet aesthetic instead of the
+   default OS chrome. Variables already swap with dark mode.
+   ========================================================= */
+:root {
+  --pg-scroll-track: rgba(124, 58, 237, 0.04);
+  --pg-scroll-thumb: rgba(124, 58, 237, 0.32);
+  --pg-scroll-thumb-hover: rgba(124, 58, 237, 0.55);
+}
+body[data-theme='dark'] {
+  --pg-scroll-track: rgba(167, 139, 250, 0.04);
+  --pg-scroll-thumb: rgba(167, 139, 250, 0.28);
+  --pg-scroll-thumb-hover: rgba(167, 139, 250, 0.55);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pg-scroll-thumb) var(--pg-scroll-track);
+}
+
+/* WebKit / Blink (Chrome, Edge, Safari) */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--pg-scroll-track);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--pg-scroll-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--pg-scroll-thumb-hover);
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Inside the dark code panel the thumb needs a softer tint
+   so it doesn't read as a separate UI element. */
+.pg-cz-code-panel *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  background-clip: padding-box;
+}
+.pg-cz-code-panel *::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+  background-clip: padding-box;
+}
+.pg-cz-code-panel * {
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
 /* Aurora background blobs */
 body::before {
   content: '';
@@ -2177,11 +2238,16 @@ body[data-theme='dark'] .pg-cz {
 /* Controls grid */
 .pg-cz-controls {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px 18px;
   padding: 20px 24px;
   overflow-y: auto;
-  flex-shrink: 0;
+  /* Allow this section to shrink when the modal can't fit everything
+     so the inner overflow-y kicks in and the output (Code + Live
+     preview) panel below stays visible. flex-shrink:0 here would
+     push the output off-screen as more controls/Theme Colors land. */
+  flex: 0 1 auto;
+  min-height: 0;
   border-bottom: 1px solid var(--pg-border);
 }
 .pg-cz-field {
@@ -2370,6 +2436,133 @@ body[data-theme='dark'] .pg-cz-select optgroup {
   border: 2px solid var(--pg-surface-elev);
 }
 
+/* Theme colors section — spans the full controls grid */
+.pg-cz-colors-section {
+  grid-column: 1 / -1;
+  border-top: 1px dashed var(--pg-border-strong);
+  padding-top: 14px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.pg-cz-colors-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pg-cz-colors-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--pg-text-mute);
+}
+.pg-cz-colors-reset {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--pg-border-strong);
+  background: var(--pg-surface);
+  color: var(--pg-text-soft);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.pg-cz-colors-reset:hover:not(:disabled) {
+  color: var(--pg-text);
+  border-color: var(--pg-accent);
+}
+.pg-cz-colors-reset:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.pg-cz-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+.pg-cz-color {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.pg-cz-color-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.pg-cz-color-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--pg-text);
+}
+.pg-cz-color-hint {
+  font-size: 10.5px;
+  color: var(--pg-text-mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pg-cz-color-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+}
+.pg-cz-color-swatch {
+  position: relative;
+  width: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid var(--pg-border-strong);
+  cursor: pointer;
+  overflow: hidden;
+  background:
+    repeating-conic-gradient(rgba(0, 0, 0, 0.08) 0% 25%, transparent 0% 50%) 50% /
+      8px 8px;
+}
+.pg-cz-color-swatch-fill {
+  position: absolute;
+  inset: 0;
+}
+.pg-cz-color-swatch input[type='color'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+}
+.pg-cz-color-input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.pg-cz-color-clear {
+  flex-shrink: 0;
+  width: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--pg-border-strong);
+  background: var(--pg-surface);
+  color: var(--pg-text-mute);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+.pg-cz-color-clear:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
 /* Output area: code + preview */
 .pg-cz-output {
   display: grid;
@@ -2494,11 +2687,29 @@ body[data-theme='light'] .pg-cz-code-panel {
   box-shadow: inset 0 -1px 0 var(--pg-border-strong);
 }
 
+@media (max-width: 1180px) {
+  .pg-cz-controls {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .pg-cz-colors-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 960px) {
   .pg-cz-controls {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .pg-cz-output {
+    grid-template-columns: 1fr;
+  }
+  .pg-cz-colors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .pg-cz-colors-grid {
     grid-template-columns: 1fr;
   }
 }

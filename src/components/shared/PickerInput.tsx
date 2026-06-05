@@ -8,6 +8,7 @@ interface PickerInputProps
   clearable?: boolean;
   onClear?: () => void;
   icon?: ReactNode;
+  iconPosition?: 'left' | 'right';
   hasValue?: boolean;
   invalid?: boolean;
   rootClassName?: string;
@@ -26,6 +27,7 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
       clearable = false,
       onClear,
       icon,
+      iconPosition = 'left',
       hasValue,
       invalid,
       className,
@@ -36,6 +38,18 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
     },
     ref,
   ) {
+    const iconNode = icon ? (
+      <span
+        className={cn(
+          'rdk-flex rdk-items-center rdk-text-rdk-text-muted rdk-pointer-events-none rdk-transition-colors group-hover:rdk-text-rdk-primary group-focus-within:rdk-text-rdk-primary [&_svg]:rdk-h-4 [&_svg]:rdk-w-4',
+          iconPosition === 'right'
+            ? 'rdk-pr-3 rdk-pl-1'
+            : 'rdk-pl-3 rdk-pr-1',
+        )}
+      >
+        {icon}
+      </span>
+    ) : null;
     return (
       <div
         className={cn(
@@ -47,11 +61,7 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
           rootClassName,
         )}
       >
-        {icon ? (
-          <span className="rdk-pl-3 rdk-pr-1 rdk-flex rdk-items-center rdk-text-rdk-text-muted rdk-pointer-events-none rdk-transition-colors group-hover:rdk-text-rdk-primary group-focus-within:rdk-text-rdk-primary [&_svg]:rdk-h-4 [&_svg]:rdk-w-4">
-            {icon}
-          </span>
-        ) : null}
+        {iconPosition === 'left' ? iconNode : null}
         <input
           ref={ref}
           {...rest}
@@ -60,7 +70,8 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
           className={cn(
             'rdk-flex-1 rdk-bg-transparent rdk-outline-none rdk-w-full rdk-min-w-0 rdk-placeholder:rdk-text-rdk-text-muted rdk-font-medium',
             sizeMap[size],
-            icon ? 'rdk-pl-3' : null,
+            icon && iconPosition === 'left' ? 'rdk-pl-3' : null,
+            icon && iconPosition === 'right' ? 'rdk-pr-3' : null,
             className,
           )}
         />
@@ -82,6 +93,7 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
             </svg>
           </button>
         ) : null}
+        {iconPosition === 'right' ? iconNode : null}
       </div>
     );
   },
