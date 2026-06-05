@@ -9,6 +9,8 @@ import { useDatePicker } from '../../hooks/useDatePicker';
 import { usePopoverTrigger } from '../../hooks/usePopoverTrigger';
 import { formatDate, defaultDateTimeFormat } from '../../utils/format';
 import { cn } from '../../utils/cn';
+import { colorsToCssVars } from '../../utils/colors';
+import { effectiveDateBounds } from '../../utils/constraints';
 import type { DateTimePickerProps, TimeValue } from '../../types';
 
 export function DateTimePicker(props: DateTimePickerProps) {
@@ -28,6 +30,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
     inline,
     size = 'md',
     theme,
+    colors,
     dir,
     weekStartsOn = 0,
     showWeekNumbers,
@@ -43,14 +46,26 @@ export function DateTimePicker(props: DateTimePickerProps) {
     id,
     name,
     autoFocus,
+    showIcon = true,
+    iconPosition = 'left',
+    headerPosition = 'top',
+    disablePast,
+    disableFuture,
   } = props;
+
+  const { minDate: effMin, maxDate: effMax } = effectiveDateBounds({
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+  });
 
   const ctrl = useDatePicker({
     value,
     defaultValue,
     onChange,
-    minDate,
-    maxDate,
+    minDate: effMin,
+    maxDate: effMax,
     disabledDates,
   });
 
@@ -66,6 +81,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
 
   const themeAttr =
     theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
+  const colorStyle = colorsToCssVars(colors);
 
   const timeValue: TimeValue = ctrl.value
     ? {
@@ -114,6 +130,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
           isDisabled={ctrl.isDisabled}
           onDayClick={commitDayKeepTime}
           renderDay={renderDay}
+          headerPosition={headerPosition}
         />
       </div>
       <div className="sm:rdk-border-l rdk-border-rdk-border">
@@ -138,6 +155,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
         ref={wrapperRef}
         data-rdk-theme={themeAttr}
         dir={dir}
+        style={colorStyle}
         className={cn(
           'rdk-inline-block rdk-bg-rdk-surface rdk-text-rdk-text rdk-border rdk-border-rdk-border rdk-rounded-rdk-lg rdk-shadow-rdk rdk-font-rdk rdk-overflow-hidden',
           className,
@@ -153,6 +171,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
       ref={wrapperRef}
       data-rdk-theme={themeAttr}
       dir={dir}
+      style={colorStyle}
       className={cn('rdk-inline-block rdk-w-full rdk-font-rdk', className)}
     >
       <PickerInput
@@ -164,7 +183,8 @@ export function DateTimePicker(props: DateTimePickerProps) {
         readOnly={readOnly}
         clearable={clearable}
         hasValue={!!ctrl.value}
-        icon={<CalendarIcon />}
+        icon={showIcon ? <CalendarIcon /> : undefined}
+        iconPosition={iconPosition}
         placeholder={placeholder}
         autoFocus={autoFocus}
         className={inputClassName}
@@ -180,7 +200,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
         anchorRef={wrapperRef}
         className={popoverClassName}
       >
-        <div data-rdk-theme={themeAttr}>
+        <div data-rdk-theme={themeAttr} style={colorStyle}>
           {panel}
           <div className="rdk-flex rdk-items-center rdk-justify-end rdk-gap-2 rdk-px-3 rdk-py-2 rdk-border-t rdk-border-rdk-border">
             <button

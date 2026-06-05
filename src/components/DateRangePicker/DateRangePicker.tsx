@@ -9,6 +9,8 @@ import { usePopoverTrigger } from '../../hooks/usePopoverTrigger';
 import { formatDate, defaultDateFormat } from '../../utils/format';
 import { DEFAULT_PRESETS } from '../../utils/presets';
 import { cn } from '../../utils/cn';
+import { colorsToCssVars } from '../../utils/colors';
+import { effectiveDateBounds } from '../../utils/constraints';
 import type { DateRange, DateRangePickerProps } from '../../types';
 
 export function DateRangePicker(props: DateRangePickerProps) {
@@ -28,6 +30,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
     inline,
     size = 'md',
     theme,
+    colors,
     dir,
     weekStartsOn = 0,
     showWeekNumbers,
@@ -41,14 +44,27 @@ export function DateRangePicker(props: DateRangePickerProps) {
     autoFocus,
     presets,
     showDefaultPresets,
+    showIcon = true,
+    iconPosition = 'left',
+    headerPosition = 'top',
+    closeOnSelect = true,
+    disablePast,
+    disableFuture,
   } = props;
+
+  const { minDate: effMin, maxDate: effMax } = effectiveDateBounds({
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+  });
 
   const ctrl = useDateRange({
     value,
     defaultValue,
     onChange,
-    minDate,
-    maxDate,
+    minDate: effMin,
+    maxDate: effMax,
     disabledDates,
   });
 
@@ -58,6 +74,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
 
   const themeAttr =
     theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
+  const colorStyle = colorsToCssVars(colors);
 
   const inputText = formatRange(ctrl.value, fmt, locale);
   const effectivePresets =
@@ -91,7 +108,12 @@ export function DateRangePicker(props: DateRangePickerProps) {
           onDayClick={(d) => {
             ctrl.selectDate(d);
             // close after end selected
-            if (ctrl.selectionStep === 'end' && ctrl.value.start && !inline) {
+            if (
+              ctrl.selectionStep === 'end' &&
+              ctrl.value.start &&
+              !inline &&
+              closeOnSelect
+            ) {
               setTimeout(() => setOpen(false), 0);
             }
           }}
@@ -99,6 +121,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
             if (ctrl.selectionStep === 'end') ctrl.setHoverDate(d);
           }}
           renderDay={renderDay}
+          headerPosition={headerPosition}
         />
         <FooterActions
           step={ctrl.selectionStep}
@@ -120,6 +143,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
         ref={wrapperRef}
         data-rdk-theme={themeAttr}
         dir={dir}
+        style={colorStyle}
         className={cn(
           'rdk-inline-block rdk-bg-rdk-surface rdk-text-rdk-text rdk-border rdk-border-rdk-border rdk-rounded-rdk-lg rdk-shadow-rdk rdk-font-rdk rdk-overflow-hidden',
           className,
@@ -135,6 +159,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
       ref={wrapperRef}
       data-rdk-theme={themeAttr}
       dir={dir}
+      style={colorStyle}
       className={cn('rdk-inline-block rdk-w-full rdk-font-rdk', className)}
     >
       <PickerInput
@@ -146,7 +171,8 @@ export function DateRangePicker(props: DateRangePickerProps) {
         readOnly
         clearable={clearable}
         hasValue={!!ctrl.value.start}
-        icon={<CalendarIcon />}
+        icon={showIcon ? <CalendarIcon /> : undefined}
+        iconPosition={iconPosition}
         placeholder={placeholder}
         autoFocus={autoFocus}
         className={inputClassName}
@@ -161,7 +187,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
         anchorRef={wrapperRef}
         className={popoverClassName}
       >
-        <div data-rdk-theme={themeAttr}>{calendarNode}</div>
+        <div data-rdk-theme={themeAttr} style={colorStyle}>{calendarNode}</div>
       </Popover>
     </div>
   );

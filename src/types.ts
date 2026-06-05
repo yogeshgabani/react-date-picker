@@ -34,6 +34,43 @@ export interface Preset {
   range: () => DateRange;
 }
 
+/**
+ * Per-instance color overrides. Any CSS color string is accepted
+ * (hex, rgb, hsl, oklch, var(...), etc.). Provided keys are written
+ * as inline CSS variables on the picker root, so they cascade to the
+ * popover content too. Omit a key to inherit the theme default.
+ */
+export interface PickerColors {
+  /** Brand color — selected day, today indicator, action buttons */
+  primary?: string;
+  /** Brand color hover state */
+  primaryHover?: string;
+  /** Soft brand tint — hover backgrounds, range fills */
+  primarySoft?: string;
+  /** Footer / muted surface background */
+  background?: string;
+  /** Calendar / popover background */
+  surface?: string;
+  /** Day-cell hover background */
+  surfaceHover?: string;
+  /** Primary text color */
+  text?: string;
+  /** Muted text color (weekday labels, helper text) */
+  textMuted?: string;
+  /** Border color */
+  border?: string;
+  /** Stronger border (dividers, scrollbar thumb) */
+  borderStrong?: string;
+  /** Danger / clear color */
+  danger?: string;
+  /** Disabled day color */
+  disabled?: string;
+  /** Range selection band background */
+  rangeBg?: string;
+  /** Focus ring color (defaults to primary) */
+  focus?: string;
+}
+
 export interface BaseProps {
   /** Show inline (always-open calendar) instead of popover */
   inline?: boolean;
@@ -49,6 +86,12 @@ export interface BaseProps {
   locale?: Locale;
   /** Color scheme */
   theme?: Theme;
+  /**
+   * Per-instance color overrides — quick way to match a project theme
+   * without writing CSS. Each key maps to one of the `--rdk-color-*`
+   * variables. Example: `colors={{ primary: '#16a34a', rangeBg: '#dcfce7' }}`
+   */
+  colors?: PickerColors;
   /** Size variant */
   size?: Size;
   /** Text direction */
@@ -65,6 +108,10 @@ export interface BaseProps {
   name?: string;
   /** Auto-focus the input on mount */
   autoFocus?: boolean;
+  /** Show the leading icon (calendar / clock). Default: `true`. */
+  showIcon?: boolean;
+  /** Which side the icon sits on. Default: `'left'`. */
+  iconPosition?: 'left' | 'right';
 }
 
 export interface BaseDateProps extends BaseProps {
@@ -84,12 +131,42 @@ export interface BaseDateProps extends BaseProps {
   numberOfMonths?: number;
   /** Custom render for a day cell */
   renderDay?: (date: Date, defaultNode: ReactNode) => ReactNode;
+  /**
+   * Position of the month/year navigation header relative to the day
+   * grid. Default: `'top'`.
+   */
+  headerPosition?: 'top' | 'bottom';
+  /**
+   * Keep the popover open after a date is selected. Default: `true`
+   * for single-date pickers (closes on select).
+   */
+  closeOnSelect?: boolean;
+  /**
+   * Disable every day before today (today still selectable). Equivalent
+   * to setting `minDate` to today.
+   */
+  disablePast?: boolean;
+  /**
+   * Disable every day after today (today still selectable). Equivalent
+   * to setting `maxDate` to today.
+   */
+  disableFuture?: boolean;
 }
+
+/**
+ * Calendar view mode. Only meaningful on single-date pickers.
+ * - `'day'` — full calendar grid (default)
+ * - `'month'` — only the 12-month grid; clicking commits the 1st of that month
+ * - `'year'` — only the 12-year grid; clicking commits January 1 of that year
+ */
+export type CalendarView = 'day' | 'month' | 'year';
 
 export interface DatePickerProps extends BaseDateProps {
   value?: Date | null;
   defaultValue?: Date | null;
   onChange?: (date: Date | null) => void;
+  /** Calendar view mode. Default: `'day'`. */
+  view?: CalendarView;
 }
 
 export interface DateRangePickerProps extends BaseDateProps {

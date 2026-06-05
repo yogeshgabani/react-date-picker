@@ -11,6 +11,7 @@ import type {
   DateRange,
   TimeValue,
   TimeRange,
+  PickerColors,
 } from 'react-datetime-kit';
 
 export type PickerKind =
@@ -39,7 +40,38 @@ type Config = {
   minuteStep: number;
   showSeconds: boolean;
   showDefaultPresets: boolean;
+  showIcon: boolean;
+  iconPosition: 'left' | 'right';
+  view: 'day' | 'month' | 'year';
+  headerPosition: 'top' | 'bottom';
+  closeOnSelect: boolean;
+  disablePast: boolean;
+  disableFuture: boolean;
+  colors: PickerColors;
 };
+
+/**
+ * Color keys exposed in the Customizer UI. We expose a curated subset
+ * (not all 14) so the panel stays readable — these cover ~95% of theme
+ * tweaks. Range pickers also get `rangeBg`.
+ */
+const COLOR_FIELDS: Array<{
+  key: keyof PickerColors;
+  label: string;
+  hint: string;
+  rangeOnly?: boolean;
+}> = [
+  { key: 'primary', label: 'Primary', hint: 'Selected day / Today button' },
+  { key: 'primaryHover', label: 'Primary hover', hint: 'Hover state of primary' },
+  { key: 'primarySoft', label: 'Primary soft', hint: 'Day-hover background' },
+  { key: 'surface', label: 'Surface', hint: 'Popover background' },
+  { key: 'background', label: 'Background', hint: 'Footer / muted surface' },
+  { key: 'text', label: 'Text', hint: 'Primary text' },
+  { key: 'textMuted', label: 'Text muted', hint: 'Weekday labels' },
+  { key: 'border', label: 'Border', hint: 'Dividers & outlines' },
+  { key: 'danger', label: 'Danger', hint: 'Clear button hover' },
+  { key: 'rangeBg', label: 'Range band', hint: 'Between start & end', rangeOnly: true },
+];
 
 const DEFAULTS: Config = {
   size: 'md',
@@ -59,6 +91,14 @@ const DEFAULTS: Config = {
   minuteStep: 1,
   showSeconds: false,
   showDefaultPresets: false,
+  showIcon: true,
+  iconPosition: 'left',
+  view: 'day',
+  headerPosition: 'top',
+  closeOnSelect: true,
+  disablePast: false,
+  disableFuture: false,
+  colors: {},
 };
 
 const COMPONENT_NAME: Record<PickerKind, string> = {
@@ -172,8 +212,41 @@ export function Customizer({
       if (cfg.showSeconds) p.showSeconds = true;
     }
     if (isRange(kind) && cfg.showDefaultPresets) p.showDefaultPresets = true;
+    if (!cfg.showIcon) p.showIcon = false;
+    if (cfg.iconPosition !== 'left') p.iconPosition = cfg.iconPosition;
+    if (hasDate(kind)) {
+      if (cfg.view !== 'day' && kind === 'date') p.view = cfg.view;
+      if (cfg.headerPosition !== 'top') p.headerPosition = cfg.headerPosition;
+      if (cfg.disablePast) p.disablePast = true;
+      if (cfg.disableFuture) p.disableFuture = true;
+    }
+    if (!cfg.closeOnSelect && (kind === 'date' || kind === 'date-range'))
+      p.closeOnSelect = false;
+    const activeColors: PickerColors = {};
+    let anyColor = false;
+    for (const k of Object.keys(cfg.colors) as Array<keyof PickerColors>) {
+      const v = cfg.colors[k];
+      if (typeof v === 'string' && v.trim()) {
+        activeColors[k] = v;
+        anyColor = true;
+      }
+    }
+    if (anyColor) p.colors = activeColors;
     return p;
   }, [cfg, kind]);
+
+  const setColor = (key: keyof PickerColors, value: string) =>
+    setCfg((p) => {
+      const next: PickerColors = { ...p.colors };
+      if (value) next[key] = value;
+      else delete next[key];
+      return { ...p, colors: next };
+    });
+
+  const resetColors = () => setCfg((p) => ({ ...p, colors: {} }));
+  const colorFields = COLOR_FIELDS.filter(
+    (f) => !f.rangeOnly || isRange(kind),
+  );
 
   const previewEl = (() => {
     switch (kind) {
@@ -220,7 +293,14 @@ export function Customizer({
     const compName = COMPONENT_NAME[kind];
     const props: string[] = ['value={value}', 'onChange={setValue}'];
     for (const [k, v] of Object.entries(liveProps)) {
-      if (typeof v === 'boolean') {
+      if (k === 'colors' && v && typeof v === 'object') {
+        const entries = Object.entries(v as Record<string, string>);
+        if (entries.length === 0) continue;
+        const inner = entries
+          .map(([ck, cv]) => `    ${ck}: '${cv}',`)
+          .join('\n');
+        props.push(`colors={{\n${inner}\n  }}`);
+      } else if (typeof v === 'boolean') {
         if (v) props.push(k);
       } else if (typeof v === 'number') {
         props.push(`${k}={${v}}`);
@@ -332,6 +412,25 @@ export function Customizer({
             />
           </Field>
 
+          <Field label="Show icon">
+            <Toggle
+              on={cfg.showIcon}
+              onChange={(v) => update('showIcon', v)}
+            />
+          </Field>
+          <Field label="Icon position">
+            <ButtonGroup
+              options={[
+                ['left', 'Left'],
+                ['right', 'Right'],
+              ]}
+              value={cfg.iconPosition}
+              onChange={(v) =>
+                update('iconPosition', v as Config['iconPosition'])
+              }
+            />
+          </Field>
+
           <Field label="Placeholder">
             <input
               className="pg-cz-input"
@@ -420,6 +519,51 @@ export function Customizer({
                   }
                 />
               </Field>
+              {kind === 'date' && (
+                <Field label="View">
+                  <ButtonGroup
+                    options={[
+                      ['day', 'Day'],
+                      ['month', 'Month'],
+                      ['year', 'Year'],
+                    ]}
+                    value={cfg.view}
+                    onChange={(v) => update('view', v as Config['view'])}
+                  />
+                </Field>
+              )}
+              <Field label="Header position">
+                <ButtonGroup
+                  options={[
+                    ['top', 'Top'],
+                    ['bottom', 'Bottom'],
+                  ]}
+                  value={cfg.headerPosition}
+                  onChange={(v) =>
+                    update('headerPosition', v as Config['headerPosition'])
+                  }
+                />
+              </Field>
+              <Field label="Disable past dates">
+                <Toggle
+                  on={cfg.disablePast}
+                  onChange={(v) => update('disablePast', v)}
+                />
+              </Field>
+              <Field label="Disable future dates">
+                <Toggle
+                  on={cfg.disableFuture}
+                  onChange={(v) => update('disableFuture', v)}
+                />
+              </Field>
+              {(kind === 'date' || kind === 'date-range') && (
+                <Field label="Close on select">
+                  <Toggle
+                    on={cfg.closeOnSelect}
+                    onChange={(v) => update('closeOnSelect', v)}
+                  />
+                </Field>
+              )}
             </>
           )}
 
@@ -469,6 +613,31 @@ export function Customizer({
               />
             </Field>
           )}
+
+          <div className="pg-cz-colors-section">
+            <div className="pg-cz-colors-head">
+              <span className="pg-cz-colors-title">Theme colors</span>
+              <button
+                type="button"
+                className="pg-cz-colors-reset"
+                onClick={resetColors}
+                disabled={Object.keys(cfg.colors).length === 0}
+              >
+                Reset
+              </button>
+            </div>
+            <div className="pg-cz-colors-grid">
+              {colorFields.map(({ key, label, hint }) => (
+                <ColorField
+                  key={key}
+                  label={label}
+                  hint={hint}
+                  value={cfg.colors[key] ?? ''}
+                  onChange={(v) => setColor(key, v)}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="pg-cz-output">
@@ -562,5 +731,61 @@ function Toggle({
     >
       <span className="pg-cz-toggle-thumb" />
     </button>
+  );
+}
+
+function ColorField({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  // `<input type="color">` always wants a 7-char hex. When the user
+  // hasn't picked anything yet (or typed a non-hex like `var(--brand)`),
+  // we fall back to a neutral swatch so the swatch still looks reasonable.
+  const swatchValue = /^#[0-9a-fA-F]{6}$/.test(value) ? value : '#7c3aed';
+  const isSet = value.length > 0;
+  return (
+    <div className={`pg-cz-color ${isSet ? 'is-set' : ''}`}>
+      <div className="pg-cz-color-label">
+        <span className="pg-cz-color-name">{label}</span>
+        <span className="pg-cz-color-hint">{hint}</span>
+      </div>
+      <div className="pg-cz-color-row">
+        <label className="pg-cz-color-swatch" aria-label={`Pick ${label}`}>
+          <span
+            className="pg-cz-color-swatch-fill"
+            style={{ background: isSet ? value : 'transparent' }}
+          />
+          <input
+            type="color"
+            value={swatchValue}
+            onChange={(e) => onChange(e.target.value)}
+          />
+        </label>
+        <input
+          className="pg-cz-input pg-cz-color-input"
+          placeholder="#7c3aed or var(--brand)"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          spellCheck={false}
+        />
+        {isSet ? (
+          <button
+            type="button"
+            className="pg-cz-color-clear"
+            onClick={() => onChange('')}
+            aria-label={`Reset ${label}`}
+          >
+            ×
+          </button>
+        ) : null}
+      </div>
+    </div>
   );
 }

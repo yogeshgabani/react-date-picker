@@ -1,5 +1,30 @@
-import { isSameDay, startOfDay } from 'date-fns';
+import { endOfDay, isSameDay, startOfDay } from 'date-fns';
 import type { DisabledDates } from '../types';
+
+/**
+ * Merge an explicit `minDate` / `maxDate` with the optional
+ * `disablePast` / `disableFuture` flags. Today is always inclusive
+ * — the bounds resolve to `startOfDay(today)` / `endOfDay(today)`.
+ * When both an explicit bound and a flag are set, the tighter of
+ * the two wins.
+ */
+export function effectiveDateBounds(opts: {
+  minDate?: Date;
+  maxDate?: Date;
+  disablePast?: boolean;
+  disableFuture?: boolean;
+}): { minDate?: Date; maxDate?: Date } {
+  let { minDate, maxDate } = opts;
+  if (opts.disablePast) {
+    const today = startOfDay(new Date());
+    minDate = minDate && minDate > today ? minDate : today;
+  }
+  if (opts.disableFuture) {
+    const today = endOfDay(new Date());
+    maxDate = maxDate && maxDate < today ? maxDate : today;
+  }
+  return { minDate, maxDate };
+}
 
 export function isDateDisabled(
   date: Date,

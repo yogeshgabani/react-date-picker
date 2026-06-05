@@ -4,7 +4,7 @@ import { CalendarHeader } from './CalendarHeader';
 import { MonthGrid } from './MonthGrid';
 import { YearMonthPicker } from './YearMonthPicker';
 import { cn } from '../../utils/cn';
-import type { Locale, WeekStartsOn } from '../../types';
+import type { CalendarView, Locale, WeekStartsOn } from '../../types';
 
 interface CalendarProps {
   visibleMonth: Date;
@@ -25,6 +25,11 @@ interface CalendarProps {
   onDayHover?: (d: Date | null) => void;
   renderDay?: (d: Date, defaultNode: ReactNode) => ReactNode;
 
+  /** Calendar mode — 'day' (default), 'month' or 'year'. */
+  view?: CalendarView;
+  /** Position of the month/year header relative to the grid. */
+  headerPosition?: 'top' | 'bottom';
+
   className?: string;
 }
 
@@ -44,12 +49,31 @@ export function Calendar({
   onDayClick,
   onDayHover,
   renderDay,
+  view = 'day',
+  headerPosition = 'top',
   className,
 }: CalendarProps) {
   const [pickerMode, setPickerMode] = useState<'days' | 'yearmonth'>('days');
   const months = Array.from({ length: numberOfMonths }, (_, i) =>
     addMonths(visibleMonth, i),
   );
+
+  // view='month' | 'year' → render a locked YearMonthPicker that
+  // commits a date (1st of month or Jan 1 of year) via onDayClick.
+  if (view === 'month' || view === 'year') {
+    return (
+      <div className={cn('rdk-w-full rdk-max-w-[320px]', className)}>
+        <YearMonthPicker
+          visibleMonth={visibleMonth}
+          onSelect={onVisibleMonthChange}
+          locale={locale}
+          lock={view}
+          onCommit={(d) => onDayClick?.(d)}
+          isDisabled={isDisabled}
+        />
+      </div>
+    );
+  }
 
   if (pickerMode === 'yearmonth') {
     return (
@@ -74,14 +98,8 @@ export function Calendar({
       )}
       onMouseLeave={() => onDayHover?.(null)}
     >
-      {months.map((m, idx) => (
-        <div
-          key={m.toISOString()}
-          className={cn(
-            'rdk-w-full rdk-max-w-[320px] sm:rdk-w-[320px]',
-            idx > 0 && 'sm:rdk-border-l sm:rdk-border-rdk-border',
-          )}
-        >
+      {months.map((m, idx) => {
+        const header = (
           <CalendarHeader
             visibleMonth={m}
             onPrevMonth={() => onVisibleMonthChange(addMonths(visibleMonth, -1))}
@@ -99,7 +117,10 @@ export function Calendar({
             onClickMonthYear={() => setPickerMode('yearmonth')}
             locale={locale}
             hideYearNav={numberOfMonths > 1 && idx !== 0 && idx !== numberOfMonths - 1}
+            className={headerPosition === 'bottom' ? 'rdk-pt-2 rdk-pb-3 rdk-border-t rdk-border-rdk-border' : undefined}
           />
+        );
+        const grid = (
           <MonthGrid
             visibleMonth={m}
             weekStartsOn={weekStartsOn}
@@ -115,8 +136,29 @@ export function Calendar({
             onDayHover={onDayHover}
             renderDay={renderDay}
           />
-        </div>
-      ))}
+        );
+        return (
+          <div
+            key={m.toISOString()}
+            className={cn(
+              'rdk-w-full rdk-max-w-[320px] sm:rdk-w-[320px]',
+              idx > 0 && 'sm:rdk-border-l sm:rdk-border-rdk-border',
+            )}
+          >
+            {headerPosition === 'bottom' ? (
+              <>
+                {grid}
+                {header}
+              </>
+            ) : (
+              <>
+                {header}
+                {grid}
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

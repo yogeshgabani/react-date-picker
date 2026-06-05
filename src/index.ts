@@ -54,4 +54,5 @@ export type {
   BaseProps,
   BaseDateProps,
   BaseTimeProps,
+  PickerColors,
 } from './types';
