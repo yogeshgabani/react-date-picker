@@ -19,7 +19,7 @@ import { Customizer, type PickerKind } from "./Customizer";
 
 type Category = "all" | "date" | "range" | "time" | "datetime" | "theming";
 
-const SITE_LAST_UPDATED = "May 28, 2026";
+const SITE_LAST_UPDATED = "June 5, 2026";
 const STATS_NAMESPACE = "react-datetime-kit-playground";
 const SESSION_VISIT_FLAG = "rdtk_visited";
 const THEME_STORAGE_KEY = "rdtk-theme-pref";
@@ -41,10 +41,60 @@ type ChangelogEntry = {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "1.1.0",
+    date: "June 5, 2026",
+    highlight:
+      "Per-instance theming, calendar view modes (day / month / year), date-range restrictions, icon controls and a themed scrollbar — every new prop is documented in the README's kitchen-sink section.",
+    isLatest: true,
+    sections: [
+      {
+        kind: "added",
+        title: "Added",
+        items: [
+          "`colors` prop on every picker — per-instance overrides for 14 semantic color keys (primary, primaryHover, primarySoft, background, surface, surfaceHover, text, textMuted, border, borderStrong, danger, disabled, rangeBg, focus). Each maps to a `--rdk-color-*` CSS variable, so any CSS color string works (hex, rgb, hsl, `var(--brand)`).",
+          "`view` prop on `DatePicker` — `'day' | 'month' | 'year'`. `'month'` shows a 12-month grid (selecting commits the 1st of that month); `'year'` shows a 12-year grid (selecting commits January 1).",
+          "`headerPosition` prop — `'top' | 'bottom'` on every date picker. Places the month/year navigation header above or below the day grid.",
+          "`closeOnSelect` prop on `DatePicker` and `DateRangePicker` — set to `false` to keep the popover open after selection.",
+          "`disablePast` / `disableFuture` props — automatic min/max constraint shortcuts. Today remains selectable. Merge correctly with explicit `minDate`/`maxDate` (the tighter bound wins).",
+          "`showIcon` prop (default `true`) — hide the leading calendar/clock icon entirely.",
+          "`iconPosition` prop — `'left' | 'right'` to move the leading icon to the trailing edge.",
+          "Themed scrollbars inside picker popovers — thin 10px purple-tinted scrollbar driven by `--rdk-scroll-track` / `--rdk-scroll-thumb` / `--rdk-scroll-thumb-hover` variables. Scoped strictly to `[data-rdk-theme]` descendants so host-page scrollbars stay untouched. Time columns get a tighter 6px variant.",
+        ],
+      },
+      {
+        kind: "changed",
+        title: "Changed",
+        items: [
+          "`YearMonthPicker` now accepts a `lock` prop (`'month' | 'year'`) plus an `onCommit` callback. Used internally to back the new `view` modes and exported for advanced composition.",
+          "`Calendar` accepts `view` and `headerPosition` so embedded usage (e.g. inside a sheet) matches the picker-level defaults.",
+          "Playground Customizer modal now exposes every new prop. Color tokens are editable through a live color-picker grid; the generated code panel formats the `colors` object as a pretty-printed object literal.",
+          "Themes tab on the playground gained five new live demo cards: Color themes, Icon controls, View modes, Date restrictions, Close on select and Header position.",
+        ],
+      },
+      {
+        kind: "docs",
+        title: "Documentation",
+        items: [
+          "New README section — **All props at a glance (kitchen sink)** — copy-paste ready `<DatePicker>` block listing every prop with an inline comment explaining its purpose and default.",
+          "Common-props and Date-picker-props tables refreshed with the new props.",
+        ],
+      },
+      {
+        kind: "technical",
+        title: "Technical",
+        items: [
+          "New utility `effectiveDateBounds()` in `utils/constraints` consolidates `minDate` / `maxDate` / `disablePast` / `disableFuture` into a single bounds object the hooks consume.",
+          "New utility `colorsToCssVars()` in `utils/colors` converts the `PickerColors` object into an inline style payload applied to both the input wrapper and the portalled popover wrapper (so portal-rendered content inherits overrides).",
+          "Type exports expanded — `PickerColors` and `CalendarView` are now part of the public type surface.",
+          "Zero new runtime dependencies. Bundle size delta: under 0.5 KB minified+gzipped.",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.0.0",
     date: "May 28, 2026",
     highlight: "First stable release — API is now stable and follows semver.",
-    isLatest: true,
     sections: [
       {
         kind: "added",
@@ -1059,6 +1109,175 @@ export function App() {
                   >
                     <DatePicker disabled defaultValue={new Date()} />
                     <DatePicker readOnly defaultValue={new Date()} />
+                  </div>
+                </Demo>
+                <Demo
+                  title="Color themes"
+                  hint="Match your brand with the colors prop"
+                  badge="Theming"
+                  kind="date"
+                  onCustomize={setCustomizer}
+                  code={`<DatePicker
+  colors={{
+    primary: '#16a34a',
+    primaryHover: '#15803d',
+    primarySoft: '#dcfce7',
+  }}
+/>
+
+<DatePicker
+  colors={{
+    primary: '#ec4899',
+    primaryHover: '#db2777',
+    primarySoft: '#fce7f3',
+  }}
+/>
+
+<DatePicker
+  colors={{
+    primary: '#f59e0b',
+    primaryHover: '#d97706',
+    primarySoft: '#fef3c7',
+  }}
+/>`}
+                >
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    <DatePicker
+                      defaultValue={new Date()}
+                      clearable
+                      colors={{
+                        primary: "#16a34a",
+                        primaryHover: "#15803d",
+                        primarySoft: "#dcfce7",
+                      }}
+                    />
+                    <DatePicker
+                      defaultValue={new Date()}
+                      clearable
+                      colors={{
+                        primary: "#ec4899",
+                        primaryHover: "#db2777",
+                        primarySoft: "#fce7f3",
+                      }}
+                    />
+                    <DatePicker
+                      defaultValue={new Date()}
+                      clearable
+                      colors={{
+                        primary: "#f59e0b",
+                        primaryHover: "#d97706",
+                        primarySoft: "#fef3c7",
+                      }}
+                    />
+                  </div>
+                </Demo>
+                <Demo
+                  title="Icon controls"
+                  hint="Hide or move the leading icon"
+                  badge="Theming"
+                  kind="date"
+                  onCustomize={setCustomizer}
+                  code={`<DatePicker showIcon={false} />
+<DatePicker iconPosition="right" />`}
+                >
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    <DatePicker defaultValue={new Date()} showIcon={false} />
+                    <DatePicker
+                      defaultValue={new Date()}
+                      iconPosition="right"
+                      clearable
+                    />
+                  </div>
+                </Demo>
+                <Demo
+                  title="View modes"
+                  hint="Day / month / year"
+                  badge="Theming"
+                  kind="date"
+                  onCustomize={setCustomizer}
+                  code={`<DatePicker view="day" />
+<DatePicker view="month" />
+<DatePicker view="year" />`}
+                >
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    <DatePicker
+                      defaultValue={new Date()}
+                      placeholder="Pick a day"
+                    />
+                    <DatePicker
+                      view="month"
+                      defaultValue={new Date()}
+                      placeholder="Pick a month"
+                    />
+                    <DatePicker
+                      view="year"
+                      defaultValue={new Date()}
+                      placeholder="Pick a year"
+                    />
+                  </div>
+                </Demo>
+                <Demo
+                  title="Date restrictions"
+                  hint="disablePast / disableFuture"
+                  badge="Theming"
+                  kind="date"
+                  onCustomize={setCustomizer}
+                  code={`<DatePicker disablePast />
+<DatePicker disableFuture />`}
+                >
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    <DatePicker
+                      disablePast
+                      placeholder="Today or later"
+                      clearable
+                    />
+                    <DatePicker
+                      disableFuture
+                      placeholder="Today or earlier"
+                      clearable
+                    />
+                  </div>
+                </Demo>
+                <Demo
+                  title="Close on select"
+                  hint="Keep popover open after picking"
+                  badge="Theming"
+                  kind="date"
+                  onCustomize={setCustomizer}
+                  code={`<DatePicker closeOnSelect={false} />`}
+                >
+                  <DatePicker
+                    closeOnSelect={false}
+                    defaultValue={new Date()}
+                    placeholder="Picker stays open"
+                    clearable
+                  />
+                </Demo>
+                <Demo
+                  title="Header position"
+                  hint="Month/year nav at top or bottom"
+                  badge="Theming"
+                  kind="date"
+                  onCustomize={setCustomizer}
+                  code={`<DatePicker headerPosition="top" />
+<DatePicker headerPosition="bottom" />`}
+                >
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    <DatePicker defaultValue={new Date()} />
+                    <DatePicker
+                      headerPosition="bottom"
+                      defaultValue={new Date()}
+                    />
                   </div>
                 </Demo>
               </>
