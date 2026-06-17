@@ -4,7 +4,7 @@
 
 A modern, accessible, **headless-inside / pretty-outside** date &amp; time picker toolkit for React. Six picker variants share one API, one theming model, and one keyboard-/screen-reader–friendly core.
 
-[![npm](https://img.shields.io/npm/v/react-upload-pro.svg?color=4f46e5&style=flat-square)](https://www.npmjs.com/package/react-datetime-kit)
+[![npm](https://img.shields.io/npm/v/react-datetime-kit.svg?color=4f46e5&style=flat-square)](https://www.npmjs.com/package/react-datetime-kit)
 [![types](https://img.shields.io/badge/types-included-3178c6?style=flat-square)](#typescript)
 [![license](https://img.shields.io/badge/license-MIT-emerald?style=flat-square)](./LICENSE)
 [![bundle](https://img.shields.io/badge/tree--shakable-✓-10b981?style=flat-square)](#performance)
@@ -27,6 +27,8 @@ DateTimePicker · DateTimeRangePicker
 - ⚡ **Tiny, tree-shakeable** — uses Floating UI for positioning, `date-fns` as a peer dep
 - 🧩 **Headless inner hooks** — `useDatePicker`, `useDateRange`, `useTimePicker` for custom UIs
 - 🌗 **Light + dark themes** out of the box (auto + manual override)
+- ✨ **Clearable inputs by default** — all pickers show a clear button; disable with `clearable={false}`
+- 🔒 **Read-only inputs** — safe keyboard handling prevents invalid manual input
 
 ---
 
@@ -266,6 +268,48 @@ const [range, setRange] = useState<DateRange>({ start: null, end: null });
   clearable
 />;
 ```
+
+---
+
+## Clearable input
+
+All pickers support a **clear button** (× icon) that appears when a value is selected. Enable it with the `clearable` prop:
+
+```tsx
+import { useState } from "react";
+import { DatePicker, TimePicker } from "react-datetime-kit";
+
+export function App() {
+  const [date, setDate] = useState<Date | null>(null);
+  const [time, setTime] = useState(null);
+
+  return (
+    <>
+      {/* Shows a × button when a date is selected */}
+      <DatePicker
+        value={date}
+        onChange={setDate}
+        clearable
+        placeholder="Pick a date"
+      />
+
+      {/* Works with all picker types */}
+      <TimePicker
+        value={time}
+        onChange={setTime}
+        clearable
+        placeholder="Pick a time"
+      />
+    </>
+  );
+}
+```
+
+**Features:**
+- ✅ Clear button appears only when a value exists
+- ✅ Click to instantly reset to `null`
+- ✅ Works with all picker variants (Date, Time, Range, DateTime, etc.)
+- ✅ Accessible — keyboard navigable and screen-reader friendly
 
 ---
 
@@ -838,31 +882,18 @@ Modern evergreen browsers (Chrome, Edge, Firefox, Safari — last two stable ver
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for the full release history.
 
-### What's new in `1.1.0` ✨
+### What's new in `1.2.0` ✨
 
-Per-instance theming, calendar view modes, date-range restrictions,
-icon controls and themed scrollbars — every new prop is documented
-in the [kitchen-sink section](#all-props-at-a-glance-kitchen-sink).
+Clearable button enabled by default, read-only input mode for safer UX, enhanced playground
+with live state display and TS/JS code toggle, improved modal compatibility.
 
-- **`colors` prop** on every picker — override 14 semantic color keys
-  (`primary`, `primaryHover`, `primarySoft`, `surface`, `text`, `border`,
-  `danger`, `rangeBg`, … ) without writing CSS. Each key maps to a
-  `--rdk-color-*` variable.
-- **`view` prop on `DatePicker`** — `'day' | 'month' | 'year'`. Month
-  view shows a 12-month grid; year view shows a 12-year grid. Selecting
-  commits the 1st of that month / January 1 of that year.
-- **`headerPosition`** — `'top' | 'bottom'` on every date picker to flip
-  the month/year navigation header to the bottom of the calendar.
-- **`closeOnSelect={false}`** — keep the popover open after a date is
-  selected (`DatePicker` and `DateRangePicker`).
-- **`disablePast` / `disableFuture`** — constraint shortcuts. Today
-  stays selectable; the props merge correctly with explicit
-  `minDate` / `maxDate`.
-- **`showIcon` / `iconPosition`** — hide the leading icon or move it
-  to the trailing edge.
-- **Themed scrollbars** — thin purple-tinted scrollbar inside picker
-  popovers, scoped to `[data-rdk-theme]` so host-page scrollbars stay
-  untouched.
+- **Clearable button by default** — All pickers now show a clear (×) button. Set `clearable={false}` to hide.
+- **Read-only input fields** — Input fields are now read-only, preventing invalid keyboard typing while maintaining calendar/time picker interaction.
+- **Improved modal compatibility** — Popover z-index increased to 9999 to ensure pickers appear above modal dialogs.
+- **Better focus visibility** — Focus ring opacity increased from 15% to 30% for improved accessibility.
+- **Enhanced playground** — Live state display, TS/JS code toggle, and improved code examples on all demos.
+
+See the [Clearable input](#clearable-input) section for examples.
 
 > Upgrading from `1.0.0`? There are **no breaking changes** — every new
 > prop has a backward-compatible default. Bundle size delta is under

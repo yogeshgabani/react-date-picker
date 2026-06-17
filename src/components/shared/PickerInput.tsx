@@ -55,11 +55,20 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
         className={cn(
           'rdk-group rdk-relative rdk-inline-flex rdk-items-center rdk-w-full rdk-text-rdk-text rdk-border-2 rdk-rounded-rdk rdk-transition-all rdk-duration-200 rdk-font-rdk',
           invalid
-            ? 'rdk-bg-rdk-surface rdk-border-rdk-danger focus-within:rdk-ring-4 focus-within:rdk-ring-rdk-danger/15'
-            : 'rdk-bg-rdk-surface-hover rdk-border-rdk-border-strong hover:rdk-bg-rdk-surface hover:rdk-border-rdk-primary hover:rdk-shadow-rdk focus-within:rdk-bg-rdk-surface focus-within:rdk-border-rdk-primary focus-within:rdk-ring-4 focus-within:rdk-ring-rdk-primary/15 focus-within:rdk-shadow-rdk',
+            ? 'rdk-bg-rdk-surface rdk-border-rdk-danger focus-within:rdk-ring-2 focus-within:rdk-ring-rdk-danger'
+            : 'rdk-bg-rdk-surface-hover rdk-border-rdk-border-strong hover:rdk-bg-rdk-surface hover:rdk-border-rdk-primary hover:rdk-shadow-rdk focus-within:rdk-bg-rdk-surface focus-within:rdk-border-rdk-primary focus-within:rdk-ring-2 focus-within:rdk-ring-rdk-primary focus-within:rdk-shadow-rdk',
           disabled && 'rdk-opacity-60 rdk-cursor-not-allowed',
           rootClassName,
         )}
+        style={
+          !invalid ? {
+            '--tw-ring-color': 'var(--rdk-color-primary)',
+            '--tw-ring-opacity': '0.3',
+          } as any : {
+            '--tw-ring-color': 'var(--rdk-color-danger)',
+            '--tw-ring-opacity': '0.3',
+          } as any
+        }
       >
         {iconPosition === 'left' ? iconNode : null}
         <input
@@ -75,7 +84,7 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
             className,
           )}
         />
-        {clearable && hasValue && !disabled && !readOnly ? (
+        {clearable && hasValue && !disabled ? (
           <button
             type="button"
             aria-label="Clear input"

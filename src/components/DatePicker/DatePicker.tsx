@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { isSameDay } from 'date-fns';
+import { endOfMonth, endOfYear, startOfDay } from 'date-fns';
 import { Popover } from '../shared/Popover';
 import { PickerInput } from '../shared/PickerInput';
 import { Calendar } from '../shared/Calendar';
@@ -8,7 +8,6 @@ import { useDatePicker } from '../../hooks/useDatePicker';
 import { useCalendarKeyboard } from '../../hooks/useCalendarKeyboard';
 import { usePopoverTrigger } from '../../hooks/usePopoverTrigger';
 import { formatDate, defaultDateFormat } from '../../utils/format';
-import { parseDate } from '../../utils/parse';
 import { cn } from '../../utils/cn';
 import { colorsToCssVars } from '../../utils/colors';
 import { effectiveDateBounds } from '../../utils/constraints';
@@ -22,12 +21,11 @@ export function DatePicker(props: DatePickerProps) {
     minDate,
     maxDate,
     disabledDates,
-    format: fmt = defaultDateFormat(),
+    format: userFormat,
     locale,
     placeholder = 'Select date',
     disabled,
-    readOnly,
-    clearable,
+    clearable = true,
     inline,
     size = 'md',
     theme,
@@ -51,6 +49,10 @@ export function DatePicker(props: DatePickerProps) {
     disablePast,
     disableFuture,
   } = props;
+
+  const fmt =
+    userFormat ??
+    (view === 'year' ? 'yyyy' : view === 'month' ? 'MMM yyyy' : defaultDateFormat());
 
   const { minDate: effMin, maxDate: effMax } = effectiveDateBounds({
     minDate,
@@ -78,9 +80,32 @@ export function DatePicker(props: DatePickerProps) {
   }, [ctrl.value, fmt, locale]);
 
   const commitDay = (d: Date) => {
-    if (ctrl.isDisabled(d)) return;
-    ctrl.setValue(d);
-    ctrl.setFocusedDate(d);
+    let target = d;
+    if (ctrl.isDisabled(target)) {
+      // For month/year views the commit date is the 1st of the month or
+      // Jan 1 of the year. If that anchor is itself disabled but the
+      // surrounding range is selectable (e.g. disablePast + current
+      // month/year), clamp to the nearest in-range day instead of
+      // silently dropping the click.
+      if (view === 'year' || view === 'month') {
+        const rangeEnd = view === 'year' ? endOfYear(d) : endOfMonth(d);
+        if (effMin && effMin >= d && effMin <= rangeEnd) {
+          const candidate = startOfDay(effMin);
+          if (!ctrl.isDisabled(candidate)) target = candidate;
+          else return;
+        } else if (effMax && effMax >= d && effMax <= rangeEnd) {
+          const candidate = startOfDay(effMax);
+          if (!ctrl.isDisabled(candidate)) target = candidate;
+          else return;
+        } else {
+          return;
+        }
+      } else {
+        return;
+      }
+    }
+    ctrl.setValue(target);
+    ctrl.setFocusedDate(target);
     if (!inline && closeOnSelect) setOpen(false);
   };
 
@@ -184,7 +209,7 @@ export function DatePicker(props: DatePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly={readOnly}
+        readOnly={true}
         clearable={clearable}
         hasValue={!!ctrl.value}
         icon={showIcon ? <CalendarIcon /> : undefined}
@@ -193,19 +218,8 @@ export function DatePicker(props: DatePickerProps) {
         autoFocus={autoFocus}
         className={inputClassName}
         value={inputText}
-        onFocus={() => !disabled && !readOnly && openFromFocus()}
-        onClick={() => !disabled && !readOnly && setOpen(true)}
-        onChange={(e) => {
-          setInputText(e.target.value);
-          const parsed = parseDate(e.target.value, fmt, locale);
-          if (parsed && !ctrl.isDisabled(parsed)) {
-            if (!ctrl.value || !isSameDay(parsed, ctrl.value)) {
-              ctrl.setValue(parsed);
-              ctrl.setVisibleMonth(parsed);
-              ctrl.setFocusedDate(parsed);
-            }
-          }
-        }}
+        onFocus={() => !disabled && openFromFocus()}
+        onClick={() => !disabled && setOpen(true)}
         onClear={() => ctrl.setValue(null)}
       />
       <Popover

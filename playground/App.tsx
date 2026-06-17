@@ -19,7 +19,7 @@ import { Customizer, type PickerKind } from "./Customizer";
 
 type Category = "all" | "date" | "range" | "time" | "datetime" | "theming";
 
-const SITE_LAST_UPDATED = "June 5, 2026";
+const SITE_LAST_UPDATED = "June 17, 2026";
 const STATS_NAMESPACE = "react-datetime-kit-playground";
 const SESSION_VISIT_FLAG = "rdtk_visited";
 const THEME_STORAGE_KEY = "rdtk-theme-pref";
@@ -41,11 +41,59 @@ type ChangelogEntry = {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "1.2.0",
+    date: "June 17, 2026",
+    highlight:
+      "Clearable button enabled by default on all pickers, read-only input mode for better UX, enhanced playground with live state display and TS/JS code toggle, improved modal compatibility.",
+    isLatest: true,
+    sections: [
+      {
+        kind: "added",
+        title: "Added",
+        items: [
+          "**Clearable button by default** — All pickers show a clear (×) button by default. Set `clearable={false}` to hide it.",
+          "**Read-only input mode** — All date/time inputs are read-only, preventing invalid keyboard typing while allowing calendar/time picker interaction.",
+          "**Playground enhancements** — Live state display showing current picker values, TS/JS code toggle for all examples.",
+          "**Clearable input documentation** — New README section explaining the `clearable` prop with working examples.",
+        ],
+      },
+      {
+        kind: "changed",
+        title: "Changed",
+        items: [
+          "**Input behavior** — Input fields now read-only by default; users interact only through picker UI (calendar/time selector).",
+          "**Focus visibility** — Increased focus ring opacity from 15% to 30% for better visibility.",
+          "**Popover z-index** — Increased from 50 to 9999 to ensure pickers appear above modals.",
+          "**Clear button logic** — Now displays on read-only inputs (previously hidden).",
+        ],
+      },
+      {
+        kind: "fixed",
+        title: "Fixed",
+        items: [
+          "Popover hidden behind modal overlays — fixed z-index stacking context.",
+          "Invalid keyboard input in date/time fields — removed support for direct typing.",
+          "Clear button not showing on read-only inputs.",
+          "Customizer clearable toggle not disabling the clear button.",
+        ],
+      },
+      {
+        kind: "technical",
+        title: "Technical",
+        items: [
+          "Updated all 6 picker components with new default values (`clearable=true`, read-only inputs).",
+          "Modified PickerInput clear button condition to show on read-only inputs.",
+          "Implemented proper character validation for date/time inputs.",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.1.0",
     date: "June 5, 2026",
     highlight:
       "Per-instance theming, calendar view modes (day / month / year), date-range restrictions, icon controls and a themed scrollbar — every new prop is documented in the README's kitchen-sink section.",
-    isLatest: true,
+    isLatest: false,
     sections: [
       {
         kind: "added",
@@ -814,7 +862,9 @@ export function App() {
                   badge="Date"
                   kind="date"
                   onCustomize={setCustomizer}
-                  code={`<DatePicker value={date} onChange={setDate} clearable />`}
+                  code={`const [date, setDate] = useState(${date?.toISOString() ?? "null"});
+
+<DatePicker value={date} onChange={setDate} clearable />`}
                   value={date?.toISOString() ?? "null"}
                 >
                   <DatePicker value={date} onChange={setDate} clearable />
@@ -826,9 +876,11 @@ export function App() {
                   badge="Date"
                   kind="date"
                   onCustomize={setCustomizer}
-                  code={`<DatePicker
-  value={value}
-  onChange={setValue}
+                  code={`const [dateEmpty, setDateEmpty] = useState(null);
+
+<DatePicker
+  value={dateEmpty}
+  onChange={setDateEmpty}
   placeholder="Pick a date"
   clearable
 />`}
@@ -848,9 +900,11 @@ export function App() {
                   badge="Date"
                   kind="date"
                   onCustomize={setCustomizer}
-                  code={`<DatePicker
-  value={date}
-  onChange={setDate}
+                  code={`const [dateWide, setDateWide] = useState(${dateWide?.toISOString() ?? "null"});
+
+<DatePicker
+  value={dateWide}
+  onChange={setDateWide}
   numberOfMonths={2}
   weekStartsOn={1}
   showWeekNumbers
@@ -874,9 +928,11 @@ export function App() {
                   badge="Date"
                   kind="date"
                   onCustomize={setCustomizer}
-                  code={`<DatePicker
-  value={date}
-  onChange={setDate}
+                  code={`const [dateInline, setDateInline] = useState(${dateInline?.toISOString() ?? "null"});
+
+<DatePicker
+  value={dateInline}
+  onChange={setDateInline}
   inline
 />`}
                   value={dateInline?.toISOString() ?? "null"}
@@ -898,7 +954,12 @@ export function App() {
                   badge="Range"
                   kind="date-range"
                   onCustomize={setCustomizer}
-                  code={`<DateRangePicker
+                  code={`const [range, setRange] = useState({
+  start: ${range.start?.toISOString() ?? "null"},
+  end: ${range.end?.toISOString() ?? "null"}
+});
+
+<DateRangePicker
   value={range}
   onChange={setRange}
   clearable
@@ -918,9 +979,14 @@ export function App() {
                   badge="Range"
                   kind="date-range"
                   onCustomize={setCustomizer}
-                  code={`<DateRangePicker
-  value={range}
-  onChange={setRange}
+                  code={`const [rangePresets, setRangePresets] = useState({
+  start: ${rangePresets.start?.toISOString() ?? "null"},
+  end: ${rangePresets.end?.toISOString() ?? "null"}
+});
+
+<DateRangePicker
+  value={rangePresets}
+  onChange={setRangePresets}
   showDefaultPresets
   clearable
 />`}
@@ -944,9 +1010,11 @@ export function App() {
                   badge="Time"
                   kind="time"
                   onCustomize={setCustomizer}
-                  code={`<TimePicker
-  value={time}
-  onChange={setTime}
+                  code={`const [time24, setTime24] = useState(${JSON.stringify(time24)});
+
+<TimePicker
+  value={time24}
+  onChange={setTime24}
   clearable
 />`}
                   value={JSON.stringify(time24)}
@@ -960,9 +1028,11 @@ export function App() {
                   badge="Time"
                   kind="time"
                   onCustomize={setCustomizer}
-                  code={`<TimePicker
-  value={time}
-  onChange={setTime}
+                  code={`const [time12, setTime12] = useState(${JSON.stringify(time12)});
+
+<TimePicker
+  value={time12}
+  onChange={setTime12}
   hourFormat={12}
   clearable
 />`}
@@ -982,9 +1052,11 @@ export function App() {
                   badge="Time"
                   kind="time"
                   onCustomize={setCustomizer}
-                  code={`<TimePicker
-  value={time}
-  onChange={setTime}
+                  code={`const [timeSec, setTimeSec] = useState(${JSON.stringify(timeSec)});
+
+<TimePicker
+  value={timeSec}
+  onChange={setTimeSec}
   showSeconds
   clearable
 />`}
@@ -1004,9 +1076,11 @@ export function App() {
                   badge="Range"
                   kind="time-range"
                   onCustomize={setCustomizer}
-                  code={`<TimeRangePicker
-  value={range}
-  onChange={setRange}
+                  code={`const [timeRange, setTimeRange] = useState(${JSON.stringify(timeRange)});
+
+<TimeRangePicker
+  value={timeRange}
+  onChange={setTimeRange}
   minuteStep={5}
   clearable
 />`}
@@ -1030,7 +1104,9 @@ export function App() {
                   badge="Date+Time"
                   kind="datetime"
                   onCustomize={setCustomizer}
-                  code={`<DateTimePicker
+                  code={`const [dt, setDt] = useState(${dt?.toISOString() ?? "null"});
+
+<DateTimePicker
   value={dt}
   onChange={setDt}
   hourFormat={12}
@@ -1054,9 +1130,14 @@ export function App() {
                   badge="Date+Time"
                   kind="datetime-range"
                   onCustomize={setCustomizer}
-                  code={`<DateTimeRangePicker
-  value={range}
-  onChange={setRange}
+                  code={`const [dtRange, setDtRange] = useState({
+  start: ${dtRange.start?.toISOString() ?? "null"},
+  end: ${dtRange.end?.toISOString() ?? "null"}
+});
+
+<DateTimeRangePicker
+  value={dtRange}
+  onChange={setDtRange}
   minuteStep={15}
   showDefaultPresets
   clearable
@@ -2071,6 +2152,32 @@ export function App() {
 }
 
 /* ============================================================
+   Helper functions
+   ============================================================ */
+function convertTsToJs(ts: string): string {
+  return ts
+    .split('\n')
+    .map(line => {
+      // Remove type annotations from useState
+      line = line.replace(/useState<[^>]+>/g, 'useState');
+      // Remove type annotations (: Type)
+      line = line.replace(/:\s*[A-Za-z<>,\s|?{}[\]]+(?=[,\)=;])/g, '');
+      // Remove generic brackets < >
+      line = line.replace(/<[^>]+>/g, '');
+      // Remove 'as Type' casts
+      line = line.replace(/\s+as\s+[A-Za-z<>,\s|]+/g, '');
+      // Clean up any remaining type syntax
+      line = line.replace(/\{\s*[A-Za-z\s:,]+\s*\}/g, (match) => {
+        // Only remove if it looks like a type object, not a code block
+        if (match.includes(':')) return '{}';
+        return match;
+      });
+      return line;
+    })
+    .join('\n');
+}
+
+/* ============================================================
    Helper components
    ============================================================ */
 function Feature({
@@ -2111,7 +2218,9 @@ function Demo({
   onCustomize?: (kind: PickerKind) => void;
 }) {
   const [showCode, setShowCode] = useState(false);
+  const [localLanguage, setLocalLanguage] = useState<'ts' | 'js'>('ts');
   const clickable = !!(kind && onCustomize);
+  const displayCode = localLanguage === 'js' && code ? convertTsToJs(code) : code;
   const handleCardClick = () => {
     if (clickable && kind) onCustomize(kind);
   };
@@ -2170,32 +2279,86 @@ function Demo({
         {children}
       </div>
       {value !== undefined && (
-        <div className="pg-value" onClick={clickable ? swallow : undefined}>
+        <div
+          onClick={clickable ? swallow : undefined}
+          style={{
+            marginTop: 12,
+            padding: "8px 12px",
+            background: "var(--pg-bg-mute)",
+            border: "1px solid var(--pg-border-mute)",
+            borderRadius: 6,
+            fontSize: 12,
+            fontFamily: "monospace",
+            color: "var(--pg-text-mute)",
+            wordBreak: "break-all",
+            maxHeight: 60,
+            overflowY: "auto",
+          }}
+        >
+          <strong style={{ color: "var(--pg-primary)" }}>State: </strong>
           {value}
         </div>
       )}
       {code && (
         <div onClick={clickable ? swallow : undefined}>
-          <button
-            type="button"
-            onClick={() => setShowCode((s) => !s)}
-            style={{
-              background: "transparent",
-              border: 0,
-              color: "var(--pg-text-mute)",
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              cursor: "pointer",
-              padding: "4px 0",
-            }}
-          >
-            {showCode ? "− Hide code" : "+ Show code"}
-          </button>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={() => setShowCode((s) => !s)}
+              style={{
+                background: "transparent",
+                border: 0,
+                color: "var(--pg-text-mute)",
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                cursor: "pointer",
+                padding: "4px 0",
+              }}
+            >
+              {showCode ? "− Hide code" : "+ Show code"}
+            </button>
+            {showCode && (
+              <div style={{ display: "flex", gap: 6, background: "var(--pg-bg-mute)", borderRadius: 4, padding: "2px 4px" }}>
+                <button
+                  type="button"
+                  onClick={() => setLocalLanguage('ts')}
+                  style={{
+                    background: localLanguage === 'ts' ? "var(--pg-primary)" : "transparent",
+                    border: 0,
+                    color: localLanguage === 'ts' ? "white" : "var(--pg-text-mute)",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    padding: "4px 8px",
+                    borderRadius: 3,
+                    cursor: "pointer",
+                  }}
+                >
+                  TS
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLocalLanguage('js')}
+                  style={{
+                    background: localLanguage === 'js' ? "var(--pg-primary)" : "transparent",
+                    border: 0,
+                    color: localLanguage === 'js' ? "white" : "var(--pg-text-mute)",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    padding: "4px 8px",
+                    borderRadius: 3,
+                    cursor: "pointer",
+                  }}
+                >
+                  JS
+                </button>
+              </div>
+            )}
+          </div>
           {showCode && (
             <pre className="pg-snippet" style={{ marginTop: 8 }}>
-              {code}
+              {displayCode}
             </pre>
           )}
         </div>

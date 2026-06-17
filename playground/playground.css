@@ -2618,6 +2618,35 @@ body[data-theme='dark'] .pg-cz-select optgroup {
   box-shadow: 0 4px 12px -6px rgba(16, 185, 129, 0.6);
 }
 
+.pg-cz-toggle-group {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.pg-cz-toggle-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--pg-text-mute);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.pg-cz-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pg-cz-toggle-btn.is-active {
+  background: var(--pg-gradient);
+  color: #fff;
+}
+
 .pg-cz-code-panel {
   background: #0f0f17;
   border-color: transparent;

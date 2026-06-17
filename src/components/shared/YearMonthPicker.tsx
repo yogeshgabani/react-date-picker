@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { setMonth, setYear, getYear, getMonth, format, startOfMonth, startOfYear } from 'date-fns';
+import { setMonth, setYear, getYear, getMonth, format, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import { cn } from '../../utils/cn';
 import type { Locale } from '../../types';
 import { ChevronLeft, ChevronRight } from './Icons';
@@ -86,7 +86,10 @@ export function YearMonthPicker({
           {years.map((y) => {
             const selected = getYear(visibleMonth) === y;
             const yearStart = startOfYear(setYear(visibleMonth, y));
-            const disabled = isDisabled ? isDisabled(yearStart) : false;
+            const yearEnd = endOfYear(yearStart);
+            const disabled = isDisabled
+              ? isDisabled(yearStart) && isDisabled(yearEnd)
+              : false;
             return (
               <button
                 key={y}
@@ -98,7 +101,9 @@ export function YearMonthPicker({
                     return;
                   }
                   onSelect(setYear(visibleMonth, y));
-                  if (!lock) setMode('month');
+                  // Both the unlocked picker and lock='month' should drop
+                  // back to the month grid after the user picks a year.
+                  if (lock !== 'year') setMode('month');
                 }}
                 className={cn(
                   'rdk-h-10 rdk-flex rdk-items-center rdk-justify-center rdk-text-center rdk-rounded-rdk-sm rdk-text-sm rdk-font-medium rdk-transition-all',
@@ -118,24 +123,51 @@ export function YearMonthPicker({
     );
   }
 
+  const currentYear = getYear(visibleMonth);
+  const canPrevYear = currentYear > minYear;
+  const canNextYear = currentYear < maxYear;
+
   return (
     <div className="rdk-p-3">
-      <div className="rdk-flex rdk-items-center rdk-justify-center rdk-pb-3">
+      <div className="rdk-flex rdk-items-center rdk-justify-between rdk-pb-3">
         <button
           type="button"
-          onClick={() => {
-            if (lock !== 'month') setMode('year');
-          }}
+          aria-label="Previous year"
+          disabled={!canPrevYear}
+          onClick={() =>
+            onSelect(setYear(visibleMonth, Math.max(minYear, currentYear - 1)))
+          }
+          className="rdk-h-8 rdk-w-8 rdk-rounded-full rdk-flex rdk-items-center rdk-justify-center rdk-text-rdk-text-muted rdk-transition-all hover:rdk-bg-rdk-primary hover:rdk-text-white hover:rdk-scale-110 active:rdk-scale-95 disabled:rdk-opacity-40 disabled:rdk-cursor-not-allowed disabled:hover:rdk-bg-transparent disabled:hover:rdk-text-rdk-text-muted disabled:hover:rdk-scale-100"
+        >
+          <ChevronLeft className="rdk-flip-x rdk-h-4 rdk-w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('year')}
           className="rdk-text-sm rdk-font-bold rdk-text-rdk-text rdk-px-4 rdk-py-1.5 rdk-rounded-rdk-sm rdk-transition-all hover:rdk-bg-rdk-primary-soft hover:rdk-text-rdk-primary rdk-tabular-nums"
         >
-          {getYear(visibleMonth)}
+          {currentYear}
+        </button>
+        <button
+          type="button"
+          aria-label="Next year"
+          disabled={!canNextYear}
+          onClick={() =>
+            onSelect(setYear(visibleMonth, Math.min(maxYear, currentYear + 1)))
+          }
+          className="rdk-h-8 rdk-w-8 rdk-rounded-full rdk-flex rdk-items-center rdk-justify-center rdk-text-rdk-text-muted rdk-transition-all hover:rdk-bg-rdk-primary hover:rdk-text-white hover:rdk-scale-110 active:rdk-scale-95 disabled:rdk-opacity-40 disabled:rdk-cursor-not-allowed disabled:hover:rdk-bg-transparent disabled:hover:rdk-text-rdk-text-muted disabled:hover:rdk-scale-100"
+        >
+          <ChevronRight className="rdk-flip-x rdk-h-4 rdk-w-4" />
         </button>
       </div>
       <div className="rdk-grid rdk-grid-cols-3 rdk-gap-2">
         {months.map((label, i) => {
           const selected = getMonth(visibleMonth) === i;
           const monthStart = startOfMonth(setMonth(visibleMonth, i));
-          const disabled = isDisabled ? isDisabled(monthStart) : false;
+          const monthEnd = endOfMonth(monthStart);
+          const disabled = isDisabled
+            ? isDisabled(monthStart) && isDisabled(monthEnd)
+            : false;
           return (
             <button
               key={label}

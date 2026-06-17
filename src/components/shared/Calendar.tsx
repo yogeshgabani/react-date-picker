@@ -85,6 +85,7 @@ export function Calendar({
             setPickerMode('days');
           }}
           locale={locale}
+          isDisabled={isDisabled}
         />
       </div>
     );

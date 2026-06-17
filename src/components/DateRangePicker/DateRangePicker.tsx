@@ -26,7 +26,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
     placeholder = 'Select date range',
     disabled,
     readOnly,
-    clearable,
+    clearable = true,
     inline,
     size = 'md',
     theme,
@@ -168,7 +168,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly
+        readOnly={readOnly}
         clearable={clearable}
         hasValue={!!ctrl.value.start}
         icon={showIcon ? <CalendarIcon /> : undefined}

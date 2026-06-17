@@ -6,7 +6,6 @@ import { ClockIcon } from '../shared/Icons';
 import { useTimePicker } from '../../hooks/useTimePicker';
 import { usePopoverTrigger } from '../../hooks/usePopoverTrigger';
 import { formatTime } from '../../utils/format';
-import { parseTime } from '../../utils/parse';
 import { cn } from '../../utils/cn';
 import { colorsToCssVars } from '../../utils/colors';
 import type { TimePickerProps, TimeValue } from '../../types';
@@ -22,8 +21,7 @@ export function TimePicker(props: TimePickerProps) {
     showSeconds = false,
     placeholder = 'Select time',
     disabled,
-    readOnly,
-    clearable,
+    clearable = true,
     inline,
     size = 'md',
     theme,
@@ -37,6 +35,8 @@ export function TimePicker(props: TimePickerProps) {
     autoFocus,
     showIcon = true,
     iconPosition = 'left',
+    minTime,
+    maxTime,
   } = props;
 
   const ctrl = useTimePicker({ value, defaultValue, onChange });
@@ -63,6 +63,8 @@ export function TimePicker(props: TimePickerProps) {
       minuteStep={minuteStep}
       secondStep={secondStep}
       showSeconds={showSeconds}
+      minTime={minTime}
+      maxTime={maxTime}
     />
   );
 
@@ -97,7 +99,7 @@ export function TimePicker(props: TimePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly={readOnly}
+        readOnly={true}
         clearable={clearable}
         hasValue={!!ctrl.value}
         icon={showIcon ? <ClockIcon /> : undefined}
@@ -106,13 +108,8 @@ export function TimePicker(props: TimePickerProps) {
         autoFocus={autoFocus}
         className={inputClassName}
         value={text}
-        onFocus={() => !disabled && !readOnly && openFromFocus()}
-        onClick={() => !disabled && !readOnly && setOpen(true)}
-        onChange={(e) => {
-          setText(e.target.value);
-          const parsed = parseTime(e.target.value);
-          if (parsed) ctrl.setValue(parsed);
-        }}
+        onFocus={() => !disabled && openFromFocus()}
+        onClick={() => !disabled && setOpen(true)}
         onClear={() => ctrl.setValue(null)}
       />
       <Popover

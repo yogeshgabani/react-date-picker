@@ -77,7 +77,7 @@ const DEFAULTS: Config = {
   size: 'md',
   disabled: false,
   readOnly: false,
-  clearable: false,
+  clearable: true,
   inline: false,
   autoFocus: false,
   placeholder: '',
@@ -165,6 +165,7 @@ export function Customizer({
     end: null,
   });
   const [copied, setCopied] = useState(false);
+  const [codeType, setCodeType] = useState<'jsx' | 'tsx'>('jsx');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -194,7 +195,7 @@ export function Customizer({
     if (cfg.size !== 'md') p.size = cfg.size;
     if (cfg.disabled) p.disabled = true;
     if (cfg.readOnly) p.readOnly = true;
-    if (cfg.clearable) p.clearable = true;
+    p.clearable = cfg.clearable;
     if (cfg.autoFocus) p.autoFocus = true;
     if (cfg.inline && !isRange(kind)) p.inline = true;
     if (cfg.placeholder.trim()) p.placeholder = cfg.placeholder;
@@ -289,7 +290,12 @@ export function Customizer({
     }
   })();
 
-  const code = useMemo(() => {
+  const getValueType = () => {
+    if (isRange(kind)) return 'null | { start: Date | null; end: Date | null }';
+    return 'Date | null';
+  };
+
+  const generateCode = () => {
     const compName = COMPONENT_NAME[kind];
     const props: string[] = ['value={value}', 'onChange={setValue}'];
     for (const [k, v] of Object.entries(liveProps)) {
@@ -309,8 +315,17 @@ export function Customizer({
       }
     }
     const body = props.map((p) => `  ${p}`).join('\n');
-    return `import { ${compName} } from 'react-datetime-kit';\n\n<${compName}\n${body}\n/>`;
-  }, [liveProps, kind]);
+
+    if (codeType === 'jsx') {
+      return `import { useState } from 'react';\nimport { ${compName} } from 'react-datetime-kit';\n\nexport default function App() {\n  const [value, setValue] = useState(null);\n\n  return (\n    <${compName}\n${body}\n    />\n  );\n}`;
+    } else {
+      // TSX version
+      const valueType = getValueType();
+      return `import { useState } from 'react';\nimport { ${compName} } from 'react-datetime-kit';\nimport type { ${isRange(kind) ? 'DateRange, TimeRange, ' : ''}TimeValue } from 'react-datetime-kit';\n\nexport default function App() {\n  const [value, setValue] = useState<${valueType}>(null);\n\n  return (\n    <${compName}\n${body}\n    />\n  );\n}`;
+    }
+  };
+
+  const code = useMemo(() => generateCode(), [liveProps, kind, codeType]);
 
   const copy = async () => {
     try {
@@ -644,6 +659,22 @@ export function Customizer({
           <div className="pg-cz-panel pg-cz-code-panel">
             <div className="pg-cz-panel-head">
               <span className="pg-cz-panel-label">Code</span>
+              <div className="pg-cz-toggle-group">
+                <button
+                  type="button"
+                  className={`pg-cz-toggle-btn ${codeType === 'jsx' ? 'is-active' : ''}`}
+                  onClick={() => setCodeType('jsx')}
+                >
+                  JS
+                </button>
+                <button
+                  type="button"
+                  className={`pg-cz-toggle-btn ${codeType === 'tsx' ? 'is-active' : ''}`}
+                  onClick={() => setCodeType('tsx')}
+                >
+                  TS
+                </button>
+              </div>
               <button
                 type="button"
                 className={`pg-cz-copy ${copied ? 'is-copied' : ''}`}

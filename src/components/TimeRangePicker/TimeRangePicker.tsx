@@ -24,7 +24,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
     placeholder = 'Select time range',
     disabled,
     readOnly,
-    clearable,
+    clearable = true,
     inline,
     size = 'md',
     theme,
@@ -38,6 +38,8 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
     autoFocus,
     showIcon = true,
     iconPosition = 'left',
+    minTime,
+    maxTime,
   } = props;
 
   const [range, setRange] = useControllableState<TimeRange>({
@@ -62,7 +64,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
 
   const panel = (
     <div className="rdk-flex rdk-items-stretch rdk-divide-x rdk-divide-rdk-border">
-      <div>
+      <div className="rdk-flex-1">
         <div className="rdk-text-[11px] rdk-font-semibold rdk-text-rdk-text-muted rdk-uppercase rdk-tracking-wide rdk-px-3 rdk-pt-3">
           From
         </div>
@@ -73,9 +75,11 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
           minuteStep={minuteStep}
           secondStep={secondStep}
           showSeconds={showSeconds}
+          minTime={minTime}
+          maxTime={current.end}
         />
       </div>
-      <div>
+      <div className="rdk-flex-1">
         <div className="rdk-text-[11px] rdk-font-semibold rdk-text-rdk-text-muted rdk-uppercase rdk-tracking-wide rdk-px-3 rdk-pt-3">
           To
         </div>
@@ -86,6 +90,8 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
           minuteStep={minuteStep}
           secondStep={secondStep}
           showSeconds={showSeconds}
+          minTime={current.start}
+          maxTime={maxTime}
         />
       </div>
     </div>
@@ -122,7 +128,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly
+        readOnly={readOnly}
         clearable={clearable}
         hasValue={!!current.start || !!current.end}
         icon={showIcon ? <ClockIcon /> : undefined}

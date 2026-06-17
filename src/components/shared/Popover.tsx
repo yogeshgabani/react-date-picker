@@ -82,9 +82,9 @@ export function Popover({
           style={{
             ...floatingStyles,
             visibility: isPositioned ? 'visible' : 'hidden',
+            zIndex: 9999,
           }}
           {...getFloatingProps()}
-          className="rdk-z-50"
         >
           <div
             className={cn(

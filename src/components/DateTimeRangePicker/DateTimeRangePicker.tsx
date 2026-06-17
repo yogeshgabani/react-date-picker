@@ -39,7 +39,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
     placeholder = 'Select date & time range',
     disabled,
     readOnly,
-    clearable,
+    clearable = true,
     inline,
     size = 'md',
     theme,
@@ -66,6 +66,8 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
     headerPosition = 'top',
     disablePast,
     disableFuture,
+    minTime,
+    maxTime,
   } = props;
 
   const { minDate: effMin, maxDate: effMax } = effectiveDateBounds({
@@ -174,6 +176,8 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
               minuteStep={minuteStep}
               secondStep={secondStep}
               showSeconds={showSeconds}
+              minTime={minTime}
+              maxTime={endTime && ctrl.value.start && ctrl.value.end ? endTime : maxTime}
             />
           </div>
           <div className="rdk-flex-1">
@@ -187,6 +191,8 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
               minuteStep={minuteStep}
               secondStep={secondStep}
               showSeconds={showSeconds}
+              minTime={startTime}
+              maxTime={maxTime}
             />
           </div>
         </div>
@@ -249,7 +255,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly
+        readOnly={readOnly}
         clearable={clearable}
         hasValue={!!ctrl.value.start}
         icon={showIcon ? <CalendarIcon /> : undefined}

@@ -190,6 +190,10 @@ export interface BaseTimeProps extends BaseProps {
   showSeconds?: boolean;
   /** Time format string (date-fns). Auto-derived if omitted. */
   format?: string;
+  /** Minimum allowed time (disable times before this) */
+  minTime?: TimeValue | null;
+  /** Maximum allowed time (disable times after this) */
+  maxTime?: TimeValue | null;
 }
 
 export interface TimePickerProps extends BaseTimeProps {

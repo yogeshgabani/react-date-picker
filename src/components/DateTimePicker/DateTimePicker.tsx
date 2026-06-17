@@ -25,8 +25,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
     locale,
     placeholder = 'Select date & time',
     disabled,
-    readOnly,
-    clearable,
+    clearable = true,
     inline,
     size = 'md',
     theme,
@@ -51,6 +50,8 @@ export function DateTimePicker(props: DateTimePickerProps) {
     headerPosition = 'top',
     disablePast,
     disableFuture,
+    minTime,
+    maxTime,
   } = props;
 
   const { minDate: effMin, maxDate: effMax } = effectiveDateBounds({
@@ -144,6 +145,8 @@ export function DateTimePicker(props: DateTimePickerProps) {
           minuteStep={minuteStep}
           secondStep={secondStep}
           showSeconds={showSeconds}
+          minTime={minTime}
+          maxTime={maxTime}
         />
       </div>
     </div>
@@ -180,7 +183,7 @@ export function DateTimePicker(props: DateTimePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly={readOnly}
+        readOnly={true}
         clearable={clearable}
         hasValue={!!ctrl.value}
         icon={showIcon ? <CalendarIcon /> : undefined}
@@ -189,9 +192,8 @@ export function DateTimePicker(props: DateTimePickerProps) {
         autoFocus={autoFocus}
         className={inputClassName}
         value={text}
-        onFocus={() => !disabled && !readOnly && openFromFocus()}
-        onClick={() => !disabled && !readOnly && setOpen(true)}
-        onChange={(e) => setText(e.target.value)}
+        onFocus={() => !disabled && openFromFocus()}
+        onClick={() => !disabled && setOpen(true)}
         onClear={() => ctrl.setValue(null)}
       />
       <Popover
