@@ -129,23 +129,44 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
   const isSameDay = ctrl.value.start && ctrl.value.end &&
     ctrl.value.start.toDateString() === ctrl.value.end.toDateString();
 
-  const endTimeMinTime = isSameDay ? addMinutesToTime(startTime, minuteStep) : startTime;
-  const startTimeMaxTime = isSameDay ? addMinutesToTime(endTime, -minuteStep) : endTime;
+  const endTimeMinTime: TimeValue = isSameDay ? addMinutesToTime(startTime, minuteStep) : startTime;
+  const startTimeMaxTime: TimeValue = isSameDay ? addMinutesToTime(endTime, -minuteStep) : endTime;
+
+  const normalizeTime = (time: TimeValue, min: TimeValue | null | undefined, max: TimeValue | null | undefined): TimeValue => {
+    let result: TimeValue = { hours: time.hours, minutes: time.minutes, seconds: time.seconds ?? 0 };
+    if (min) {
+      const timeInMinutes = time.hours * 60 + time.minutes;
+      const minInMinutes = min.hours * 60 + min.minutes;
+      if (timeInMinutes < minInMinutes) {
+        result = { hours: min.hours, minutes: min.minutes, seconds: time.seconds ?? 0 };
+      }
+    }
+    if (max) {
+      const timeInMinutes = result.hours * 60 + result.minutes;
+      const maxInMinutes = max.hours * 60 + max.minutes;
+      if (timeInMinutes > maxInMinutes) {
+        result = { hours: max.hours, minutes: max.minutes, seconds: result.seconds };
+      }
+    }
+    return result;
+  };
 
   const applyStartTime = (t: TimeValue) => {
     if (!ctrl.value.start) return;
+    const normalized = normalizeTime(t, minTime, startTimeMaxTime);
     const merged = setSeconds(
-      setMinutes(setHours(ctrl.value.start, t.hours), t.minutes),
-      t.seconds ?? 0,
+      setMinutes(setHours(ctrl.value.start, normalized.hours), normalized.minutes),
+      normalized.seconds ?? 0,
     );
     ctrl.setValue({ start: merged, end: ctrl.value.end });
   };
 
   const applyEndTime = (t: TimeValue) => {
     if (!ctrl.value.end) return;
+    const normalized = normalizeTime(t, endTimeMinTime, maxTime);
     const merged = setSeconds(
-      setMinutes(setHours(ctrl.value.end, t.hours), t.minutes),
-      t.seconds ?? 0,
+      setMinutes(setHours(ctrl.value.end, normalized.hours), normalized.minutes),
+      normalized.seconds ?? 0,
     );
     ctrl.setValue({ start: ctrl.value.start, end: merged });
   };

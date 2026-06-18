@@ -57,8 +57,24 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
     theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
   const colorStyle = colorsToCssVars(colors);
 
-  const setStart = (t: TimeValue) => setRange({ start: t, end: current.end });
-  const setEnd = (t: TimeValue) => setRange({ start: current.start, end: t });
+  const normalizeTime = (time: TimeValue, minTime: TimeValue | null): TimeValue => {
+    if (!minTime) return time;
+    const timeInMinutes = time.hours * 60 + time.minutes;
+    const minInMinutes = minTime.hours * 60 + minTime.minutes;
+    if (timeInMinutes < minInMinutes) {
+      return { hours: minTime.hours, minutes: minTime.minutes, seconds: time.seconds };
+    }
+    return time;
+  };
+
+  const setStart = (t: TimeValue) => {
+    const normalized = minTime ? normalizeTime(t, minTime) : t;
+    setRange({ start: normalized, end: current.end });
+  };
+  const setEnd = (t: TimeValue) => {
+    const normalized = normalizeTime(t, endMinTime);
+    setRange({ start: current.start, end: normalized });
+  };
 
   const text = formatRange(current, hourFormat, showSeconds);
 
