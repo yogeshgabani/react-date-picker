@@ -665,7 +665,7 @@ export function App() {
         <header className="pg-hero">
           <div className="pg-tag">
             <span className="pg-tag-dot" />
-            v1.2.3 · TypeScript · Tailwind · 6 pickers
+            v1.2.4 · TypeScript · Tailwind · 6 pickers
           </div>
 
           <h1 className="pg-title">

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-06-18
+
+### Fixed
+- **Keyboard input constraint enforcement** — TimePanel now respects min/max time constraints when users type time values via keyboard. Prevents bypassing disabled time selections.
+- **Time range auto-snap behavior** — When end time is selected below the minimum constraint (e.g., minute=00 when minTime=1:05), it automatically snaps to the minimum allowed value for better UX.
+
+### Details
+- Enhanced `processKeyInput()` in TimePanel to check `isHourDisabled`, `isMinuteDisabled`, and `isSecondDisabled`
+- Added `normalizeTime()` utility function in TimeRangePicker and DateTimeRangePicker to auto-snap invalid time selections
+- Ensures users selecting FROM=1:00 with minuteStep={5} cannot select TO=1:00 (automatically becomes 1:05)
+
 ## [1.2.3] - 2026-06-18
 
 ### Fixed
@@ -144,7 +155,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status | Key Features |
 |---------|------|--------|--------------|
-| 1.2.3 | 2026-06-18 | Latest | Time range picker constraints |
+| 1.2.4 | 2026-06-18 | Latest | Keyboard input constraints, time auto-snap |
+| 1.2.3 | 2026-06-18 | Stable | Time range picker constraints |
 | 1.2.2 | 2026-06-18 | Stable | React warnings fix, focus ring improvements |
 | 1.2.1 | 2026-06-18 | Stable | Version alignment |
 | 1.2.0 | 2026-06-17 | Stable | Clearable default, read-only inputs, min/max time |
