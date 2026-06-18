@@ -41,7 +41,7 @@ type ChangelogEntry = {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
-    version: "1.2.0",
+    version: "1.2.4",
     date: "June 17, 2026",
     highlight:
       "Clearable button enabled by default on all pickers, read-only input mode for better UX, enhanced playground with live state display and TS/JS code toggle, improved modal compatibility.",
