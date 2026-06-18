@@ -115,6 +115,23 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
       }
     : { hours: 23, minutes: 59, seconds: 0 };
 
+  const addMinutesToTime = (time: TimeValue, minutes: number): TimeValue => {
+    let totalMinutes = time.hours * 60 + time.minutes + minutes;
+    if (totalMinutes > 24 * 60 - 1) totalMinutes = 24 * 60 - 1;
+    if (totalMinutes < 0) totalMinutes = 0;
+    return {
+      hours: Math.floor(totalMinutes / 60) % 24,
+      minutes: totalMinutes % 60,
+      seconds: time.seconds,
+    };
+  };
+
+  const isSameDay = ctrl.value.start && ctrl.value.end &&
+    ctrl.value.start.toDateString() === ctrl.value.end.toDateString();
+
+  const endTimeMinTime = isSameDay ? addMinutesToTime(startTime, minuteStep) : startTime;
+  const startTimeMaxTime = isSameDay ? addMinutesToTime(endTime, -minuteStep) : endTime;
+
   const applyStartTime = (t: TimeValue) => {
     if (!ctrl.value.start) return;
     const merged = setSeconds(
@@ -177,7 +194,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
               secondStep={secondStep}
               showSeconds={showSeconds}
               minTime={minTime}
-              maxTime={endTime && ctrl.value.start && ctrl.value.end ? endTime : maxTime}
+              maxTime={endTime && ctrl.value.start && ctrl.value.end ? startTimeMaxTime : maxTime}
             />
           </div>
           <div className="rdk-flex-1">
@@ -191,7 +208,7 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
               minuteStep={minuteStep}
               secondStep={secondStep}
               showSeconds={showSeconds}
-              minTime={startTime}
+              minTime={endTimeMinTime}
               maxTime={maxTime}
             />
           </div>

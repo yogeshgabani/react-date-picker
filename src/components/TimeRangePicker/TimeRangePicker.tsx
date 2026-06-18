@@ -62,6 +62,20 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
 
   const text = formatRange(current, hourFormat, showSeconds);
 
+  const addMinutesToTime = (time: TimeValue | null, minutes: number): TimeValue | null => {
+    if (!time) return null;
+    let totalMinutes = time.hours * 60 + time.minutes + minutes;
+    if (totalMinutes > 24 * 60 - 1) totalMinutes = 24 * 60 - 1;
+    return {
+      hours: Math.floor(totalMinutes / 60) % 24,
+      minutes: totalMinutes % 60,
+      seconds: time.seconds,
+    };
+  };
+
+  const endMinTime = current.start ? addMinutesToTime(current.start, minuteStep) : null;
+  const startMaxTime = current.end ? addMinutesToTime(current.end, -minuteStep) : null;
+
   const panel = (
     <div className="rdk-flex rdk-items-stretch rdk-divide-x rdk-divide-rdk-border">
       <div className="rdk-flex-1">
@@ -76,7 +90,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
           secondStep={secondStep}
           showSeconds={showSeconds}
           minTime={minTime}
-          maxTime={current.end}
+          maxTime={startMaxTime}
         />
       </div>
       <div className="rdk-flex-1">
@@ -90,7 +104,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
           minuteStep={minuteStep}
           secondStep={secondStep}
           showSeconds={showSeconds}
-          minTime={current.start}
+          minTime={endMinTime}
           maxTime={maxTime}
         />
       </div>
