@@ -128,7 +128,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly={readOnly}
+        readOnly={true}
         clearable={clearable}
         hasValue={!!current.start || !!current.end}
         icon={showIcon ? <ClockIcon /> : undefined}

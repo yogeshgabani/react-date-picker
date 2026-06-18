@@ -168,7 +168,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
         name={name}
         size={size}
         disabled={disabled}
-        readOnly={readOnly}
+        readOnly={true}
         clearable={clearable}
         hasValue={!!ctrl.value.start}
         icon={showIcon ? <CalendarIcon /> : undefined}

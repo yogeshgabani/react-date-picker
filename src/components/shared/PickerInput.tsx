@@ -63,10 +63,10 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
         style={
           !invalid ? {
             '--tw-ring-color': 'var(--rdk-color-primary)',
-            '--tw-ring-opacity': '0.3',
+            '--tw-ring-opacity': '0.2',
           } as any : {
             '--tw-ring-color': 'var(--rdk-color-danger)',
-            '--tw-ring-opacity': '0.3',
+            '--tw-ring-opacity': '0.15',
           } as any
         }
       >

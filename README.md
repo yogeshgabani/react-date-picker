@@ -882,6 +882,13 @@ Modern evergreen browsers (Chrome, Edge, Firefox, Safari — last two stable ver
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for the full release history.
 
+### What's new in `1.2.2` 🐛
+
+Bug fixes and focus ring refinements.
+
+- **Reduced focus ring opacity** — Primary focus ring reduced from 30% to 20%, danger ring from 30% to 15% for more subtle focus indication while maintaining accessibility.
+- **Fixed React warning** — Resolved "value without onChange/readOnly" warning on range pickers by explicitly setting `readOnly={true}` on inputs.
+
 ### What's new in `1.2.0` ✨
 
 Clearable button enabled by default, read-only input mode for safer UX, enhanced playground
