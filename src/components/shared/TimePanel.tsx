@@ -104,13 +104,13 @@ export function TimePanel({
     if (focusedColumn === 'hour') {
       if (sequence.length === 1) {
         const num = parseInt(digit);
-        if (num <= (hourFormat === 12 ? 12 : 23)) {
+        if (num <= (hourFormat === 12 ? 12 : 23) && !isHourDisabled(num)) {
           newValue.hours = num;
           updated = true;
         }
       } else if (sequence.length === 2) {
         const num = parseInt(sequence);
-        if (num <= (hourFormat === 12 ? 12 : 23)) {
+        if (num <= (hourFormat === 12 ? 12 : 23) && !isHourDisabled(num)) {
           newValue.hours = num;
           updated = true;
         }
@@ -118,13 +118,13 @@ export function TimePanel({
     } else if (focusedColumn === 'minute') {
       if (sequence.length === 1) {
         const num = parseInt(digit);
-        if (num <= 59) {
+        if (num <= 59 && !isMinuteDisabled(num)) {
           newValue.minutes = num;
           updated = true;
         }
       } else if (sequence.length === 2) {
         const num = parseInt(sequence);
-        if (num <= 59) {
+        if (num <= 59 && !isMinuteDisabled(num)) {
           newValue.minutes = num;
           updated = true;
         }
@@ -132,13 +132,13 @@ export function TimePanel({
     } else if (focusedColumn === 'second') {
       if (sequence.length === 1) {
         const num = parseInt(digit);
-        if (num <= 59) {
+        if (num <= 59 && !isSecondDisabled(num)) {
           newValue.seconds = num;
           updated = true;
         }
       } else if (sequence.length === 2) {
         const num = parseInt(sequence);
-        if (num <= 59) {
+        if (num <= 59 && !isSecondDisabled(num)) {
           newValue.seconds = num;
           updated = true;
         }
