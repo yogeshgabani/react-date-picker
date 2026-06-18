@@ -1,6 +1,6 @@
 {
   "name": "react-datetime-kit",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Modern, accessible, customizable React date picker, time picker, date range picker, time range picker, datetime picker and datetime range picker — TypeScript-first, themeable, mobile-friendly, with keyboard navigation, ARIA support, RTL, i18n, dark mode and Moment-style format tokens.",
   "keywords": [
     "react",
