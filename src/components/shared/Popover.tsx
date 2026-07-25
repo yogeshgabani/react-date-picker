@@ -1,4 +1,5 @@
 import {
+  type CSSProperties,
   type ReactNode,
   type RefObject,
   useLayoutEffect,
@@ -26,6 +27,15 @@ interface PopoverProps {
   className?: string;
   /** Distance from the trigger in pixels */
   gutter?: number;
+  /**
+   * `data-rdk-theme` value for the panel. The popover is portaled to
+   * `document.body`, so it is NOT inside the picker's own theme scope — the
+   * surface it paints has to carry the scope itself, otherwise the shell
+   * resolves the page-level tokens while its children resolve the picker's.
+   */
+  theme?: 'light' | 'dark' | 'auto';
+  /** `--rdk-color-*` overrides from the `colors` prop, scoped to the panel. */
+  themeStyle?: CSSProperties;
 }
 
 /**
@@ -39,6 +49,8 @@ export function Popover({
   children,
   className,
   gutter = 8,
+  theme,
+  themeStyle,
 }: PopoverProps) {
   // Track the reference element via state so useFloating gets it BEFORE the
   // first render — otherwise the panel briefly paints at (0,0) and then jumps
@@ -87,8 +99,10 @@ export function Popover({
           {...getFloatingProps()}
         >
           <div
+            data-rdk-theme={theme}
+            style={themeStyle}
             className={cn(
-              'rdk-bg-rdk-surface rdk-text-rdk-text rdk-border rdk-border-rdk-border rdk-rounded-rdk-lg rdk-shadow-rdk-lg rdk-font-rdk rdk-animate-rdk-in rdk-overflow-hidden',
+              'rdk-popover-surface rdk-text-rdk-text rdk-border rdk-border-rdk-border rdk-rounded-rdk-lg rdk-shadow-rdk-lg rdk-font-rdk rdk-animate-rdk-in rdk-overflow-hidden',
               className,
             )}
           >

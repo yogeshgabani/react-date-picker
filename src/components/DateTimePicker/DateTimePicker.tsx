@@ -80,8 +80,11 @@ export function DateTimePicker(props: DateTimePickerProps) {
     setText(formatDate(ctrl.value, fullFormat, locale));
   }, [ctrl.value, fullFormat, locale]);
 
-  const themeAttr =
-    theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
+  // `auto` (the default) emits the attribute without any token block behind
+  // it, so the picker inherits whatever `prefers-color-scheme` resolved on
+  // :root while still being targetable by host CSS and the scoped resets.
+  const themeAttr: 'light' | 'dark' | 'auto' =
+    theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : 'auto';
   const colorStyle = colorsToCssVars(colors);
 
   const timeValue: TimeValue = ctrl.value
@@ -201,6 +204,8 @@ export function DateTimePicker(props: DateTimePickerProps) {
         onOpenChange={setOpen}
         anchorRef={wrapperRef}
         className={popoverClassName}
+        theme={themeAttr}
+        themeStyle={colorStyle}
       >
         <div data-rdk-theme={themeAttr} style={colorStyle}>
           {panel}

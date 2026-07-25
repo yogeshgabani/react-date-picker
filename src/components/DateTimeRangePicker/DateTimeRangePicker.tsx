@@ -90,8 +90,11 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const themeAttr =
-    theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : undefined;
+  // `auto` (the default) emits the attribute without any token block behind
+  // it, so the picker inherits whatever `prefers-color-scheme` resolved on
+  // :root while still being targetable by host CSS and the scoped resets.
+  const themeAttr: 'light' | 'dark' | 'auto' =
+    theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : 'auto';
   const colorStyle = colorsToCssVars(colors);
 
   const fullFormat = fmt ?? defaultDateTimeFormat(hourFormat, showSeconds);
@@ -311,6 +314,8 @@ export function DateTimeRangePicker(props: DateTimeRangePickerProps) {
         onOpenChange={setOpen}
         anchorRef={wrapperRef}
         className={popoverClassName}
+        theme={themeAttr}
+        themeStyle={colorStyle}
       >
         <div data-rdk-theme={themeAttr} style={colorStyle}>{panel}</div>
       </Popover>

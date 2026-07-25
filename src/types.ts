@@ -51,6 +51,20 @@ export interface PickerColors {
   background?: string;
   /** Calendar / popover background */
   surface?: string;
+  /**
+   * Background of the floating dropdown panel only, leaving `surface`
+   * (inline panels, time columns, inputs) untouched. Accepts any CSS
+   * colour, including translucent ones — `rgb(24 24 27 / 0.75)`,
+   * `#18181bbf`, `color-mix(…)`. Defaults to `surface`.
+   */
+  popover?: string;
+  /**
+   * Backdrop blur behind the dropdown panel, e.g. `'12px'` (a bare length
+   * is wrapped in `blur()`; a full filter like `'blur(12px) saturate(160%)'`
+   * is passed through). Only meaningful alongside a translucent `popover` —
+   * without it, low-opacity panels are unreadable over busy content.
+   */
+  popoverBlur?: string;
   /** Day-cell hover background */
   surfaceHover?: string;
   /** Primary text color */

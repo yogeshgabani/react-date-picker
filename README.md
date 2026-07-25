@@ -451,7 +451,9 @@ function KitchenSink() {
         primaryHover: "#6d28d9", //   primary hover state
         primarySoft: "#f3e8ff", //   day-hover background
         background: "#fafafa", //   footer / muted surface
-        surface: "#ffffff", //   popover background
+        surface: "#ffffff", //   panel / input background
+        popover: "#ffffff", //   dropdown only — alpha ok, defaults to surface
+        popoverBlur: "14px", //   backdrop blur behind a translucent dropdown
         surfaceHover: "#f5f3ff", //   row hover background
         text: "#18181b", //   primary text
         textMuted: "#71717a", //   labels / helper text
@@ -666,6 +668,12 @@ All visual styles are driven by **CSS variables**. Override them on `:root` (glo
   --rdk-color-disabled: #d4d4d8;
   --rdk-color-range-bg: #f3e8ff;
 
+  /* Dropdown panel — both optional; unset means "follow `surface`, no blur".
+     Setting these on :root pins one value for every theme, so declare them
+     inside your own light/dark blocks if they should follow the scheme. */
+  --rdk-color-popover: rgb(255 255 255 / 0.72);
+  --rdk-popover-backdrop: blur(14px);
+
   /* Radius */
   --rdk-radius: 0.75rem;
   --rdk-radius-sm: 0.5rem;
@@ -682,6 +690,68 @@ All visual styles are driven by **CSS variables**. Override them on `:root` (glo
     0 12px 24px -8px rgba(24, 24, 27, 0.08);
 }
 ```
+
+### Translucent dropdown
+
+`popover` styles the floating panel only — inline panels, time columns and the
+input keep using `surface`. Because it takes any CSS color, translucency is just
+a matter of passing one with alpha. Pair it with `popoverBlur`, or low-opacity
+panels become unreadable over busy content:
+
+```tsx
+<DateTimePicker
+  value={value}
+  onChange={setValue}
+  colors={{
+    popover: "rgb(24 24 27 / 0.72)",
+    popoverBlur: "14px", // bare length is wrapped in blur()
+  }}
+/>
+```
+
+`popoverBlur` also accepts a full filter list — `"blur(14px) saturate(160%)"` —
+for a stronger glass effect. Both default to unset, so a picker that doesn't opt
+in paints exactly as before and never pays for a backdrop filter.
+
+### Tinting a panel without losing legibility
+
+Every colour key takes a raw CSS colour, so alpha and `color-mix()` work
+everywhere — but the two read very differently, and picking the wrong one is the
+usual reason a themed picker turns unreadable:
+
+```tsx
+// See-through: whatever is behind the picker shows through the panel.
+// Right for the floating dropdown — that's the glass effect.
+colors={{ popover: "rgb(124 58 237 / 15%)", popoverBlur: "14px" }}
+
+// Tinted but opaque: blended over the theme background, nothing bleeds
+// through. Right for `surface`, which paints every panel the dates sit on.
+colors={{ surface: "color-mix(in srgb, #7c3aed 15%, #ffffff)" }}
+```
+
+`surface` at full strength is what buries a calendar — dark text on a dark fill.
+Blend it instead and the panel keeps its contrast. Use `#ffffff` as the base for
+a light picker and `#18181b` for a dark one; for a picker that follows the
+browser, declare it per scheme in your own CSS rather than inline:
+
+```css
+:root {
+  --rdk-color-surface: color-mix(in srgb, #7c3aed 15%, #ffffff);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rdk-color-surface: color-mix(in srgb, #7c3aed 15%, #18181b);
+  }
+}
+```
+
+> Don't write `color-mix(…, var(--rdk-color-surface))` into `--rdk-color-surface`
+> itself — a custom property that references itself is invalid at computed-value
+> time and CSS throws the whole declaration away.
+
+The Customizer on the [docs site](https://react-datetime-kit.netlify.app) has
+sliders for both, and its Code panel emits the exact value it is previewing, so
+you can copy it straight into your app.
 
 ### Scoped theming
 

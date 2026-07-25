@@ -1,5 +1,29 @@
 import type { Config } from 'tailwindcss';
 
+/**
+ * Theme tokens are authored as plain CSS custom properties holding *any*
+ * CSS color (hex, rgb(), hsl(), a keyword — whatever the host app sets).
+ * Tailwind can only apply an opacity modifier (`bg-rdk-primary/40`) to a
+ * color it knows how to inject alpha into; for a bare `var(--x)` string it
+ * silently DROPS the utility instead, which is how the "today" ring and
+ * every other `/NN` class ended up missing from the built stylesheet.
+ *
+ * Returning a function lets us keep the tokens as opaque CSS colors while
+ * still supporting modifiers: the un-modified case emits the raw `var()`
+ * exactly as before (zero change in output), and only the `/NN` case falls
+ * back to `color-mix()`.
+ */
+const token =
+  (name: string) =>
+  ({ opacityValue }: { opacityValue?: string; opacityVariable?: string }) => {
+    // `opacityValue` is `var(--tw-bg-opacity, 1)` for the plain utility and a
+    // literal like `0.4` for `/40`. Only the literal form needs color-mix.
+    if (!opacityValue || opacityValue === '1' || opacityValue.startsWith('var(')) {
+      return `var(${name})`;
+    }
+    return `color-mix(in srgb, var(${name}) calc(${opacityValue} * 100%), transparent)`;
+  };
+
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}', './playground/**/*.{ts,tsx,html}'],
   prefix: 'rdk-',
@@ -8,20 +32,20 @@ const config: Config = {
     extend: {
       colors: {
         rdk: {
-          primary: 'var(--rdk-color-primary)',
-          'primary-hover': 'var(--rdk-color-primary-hover)',
-          'primary-soft': 'var(--rdk-color-primary-soft)',
-          bg: 'var(--rdk-color-bg)',
-          surface: 'var(--rdk-color-surface)',
-          'surface-hover': 'var(--rdk-color-surface-hover)',
-          text: 'var(--rdk-color-text)',
-          'text-muted': 'var(--rdk-color-text-muted)',
-          border: 'var(--rdk-color-border)',
-          'border-strong': 'var(--rdk-color-border-strong)',
-          danger: 'var(--rdk-color-danger)',
-          disabled: 'var(--rdk-color-disabled)',
-          'range-bg': 'var(--rdk-color-range-bg)',
-        },
+          primary: token('--rdk-color-primary'),
+          'primary-hover': token('--rdk-color-primary-hover'),
+          'primary-soft': token('--rdk-color-primary-soft'),
+          bg: token('--rdk-color-bg'),
+          surface: token('--rdk-color-surface'),
+          'surface-hover': token('--rdk-color-surface-hover'),
+          text: token('--rdk-color-text'),
+          'text-muted': token('--rdk-color-text-muted'),
+          border: token('--rdk-color-border'),
+          'border-strong': token('--rdk-color-border-strong'),
+          danger: token('--rdk-color-danger'),
+          disabled: token('--rdk-color-disabled'),
+          'range-bg': token('--rdk-color-range-bg'),
+        } as unknown as Record<string, string>,
       },
       borderRadius: {
         rdk: 'var(--rdk-radius)',

@@ -209,7 +209,11 @@ export function TimePanel({
     <div
       ref={panelRef}
       className={cn(
-        'rdk-flex rdk-items-end rdk-gap-2 rdk-p-3 rdk-bg-rdk-surface rdk-outline-none',
+        // No background of its own: the panel always sits directly on a
+        // surface (the popover shell or the inline wrapper), and painting an
+        // opaque second copy of it would punch through a translucent
+        // `colors.popover`.
+        'rdk-flex rdk-items-end rdk-gap-2 rdk-p-3 rdk-outline-none',
         className,
       )}
       tabIndex={0}

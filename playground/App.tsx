@@ -19,7 +19,7 @@ import { Customizer, type PickerKind } from "./Customizer";
 
 type Category = "all" | "date" | "range" | "time" | "datetime" | "theming";
 
-const SITE_LAST_UPDATED = "June 17, 2026";
+const SITE_LAST_UPDATED = "July 25, 2026";
 const STATS_NAMESPACE = "react-datetime-kit-playground";
 const SESSION_VISIT_FLAG = "rdtk_visited";
 const THEME_STORAGE_KEY = "rdtk-theme-pref";
@@ -41,11 +41,61 @@ type ChangelogEntry = {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "1.3.0",
+    date: "July 25, 2026",
+    highlight:
+      "Dropdown panels get their own background colour, opacity and backdrop blur. Plus a round of theming fixes: the portaled popover now carries the picker's theme, theme=\"light\" actually works, today's date is visible again, and scrollbars lost their stepper arrows.",
+    isLatest: true,
+    sections: [
+      {
+        kind: "added",
+        title: "Added",
+        items: [
+          "**`colors.popover`** — background for the floating dropdown only, leaving `surface` (inline panels, time columns, input) untouched. Any CSS colour works, including translucent ones like `rgb(24 24 27 / 0.72)`. Defaults to `surface`.",
+          "**`colors.popoverBlur`** — backdrop blur behind the dropdown, e.g. `'14px'`. A bare length is wrapped in `blur()`; a full filter list like `'blur(14px) saturate(160%)'` passes through. Both keys default to unset, so opting out costs nothing.",
+          "**Customizer — Dropdown panel controls** — background colour, opacity and blur. Leave the colour empty and lower the opacity to keep the system background and just make it see-through.",
+          "**Customizer — Surface tint slider** — Surface paints every panel, so a saturated pick at full strength buried the dates in it. The tint blends over the theme background instead of over transparency, so the panel stays opaque.",
+        ],
+      },
+      {
+        kind: "fixed",
+        title: "Fixed",
+        items: [
+          "**Dropdown rendered in the wrong theme** — the popover is portaled to `document.body`, so its shell sat outside the picker's theme scope and resolved page-level tokens while its children resolved the picker's. A `theme=\"dark\"` picker in a light browser showed a white calendar with a dark time panel. The shell now carries the scope itself.",
+          "**`theme=\"light\"` did nothing** — no CSS declared the light tokens for `[data-rdk-theme=\"light\"]`, so an explicitly-light picker on a dark-scheme page inherited the dark values.",
+          "**Host `:root` colour overrides ignored in dark mode** — the auto-theme selector out-specified a consumer's own branding whenever the OS was dark.",
+          "**Today's date was invisible** — its ring fell back to Tailwind's default blue and its soft fill was silently dropped from the stylesheet. Today now uses a solid themed ring and shows its primary colour.",
+          "**Every `/opacity` utility was missing** — theme tokens were bare `var()` strings, which Tailwind can't inject alpha into, so ten utilities were dropped at build time. Tokens are alpha-capable now.",
+          "**Scrollbar stepper arrows** — declaring any `::-webkit-scrollbar` rule brings the platform arrows back unless removed explicitly. Scrollbar theming was also scoped to an attribute only emitted for explicit light/dark, so a default `theme=\"auto\"` picker had none at all.",
+        ],
+      },
+      {
+        kind: "changed",
+        title: "Changed",
+        items: [
+          "`theme=\"auto\"` now emits `data-rdk-theme=\"auto\"` so host CSS can target it — no token block attached, so it still follows `prefers-color-scheme`.",
+          "`TimePanel` no longer paints its own background; the duplicate fill punched through a translucent `colors.popover`.",
+          "The **Background** colour field is hidden for pickers that never paint `--rdk-color-bg` — it only backs the Today/Clear footer bar in `DatePicker` and `DateRangePicker`.",
+        ],
+      },
+      {
+        kind: "technical",
+        title: "Technical",
+        items: [
+          "Theme tokens are declared through a Tailwind colour function that emits plain `var()` for un-modified utilities and `color-mix()` only for `/NN` modifiers — no change to existing output.",
+          "Token blocks are ordered `:root` → `prefers-color-scheme` → `[data-rdk-theme=\"light\"]` → `[data-rdk-theme=\"dark\"]`; a theme switcher setting the attribute on `<html>` targets the same element as `:root`, so the explicit blocks must come last to win the tie.",
+          "`--rdk-color-popover` resolves through a use-site fallback rather than a `:root` declaration, so a picker with its own theme scope doesn't inherit the page-level surface.",
+          "Hand-written vendor prefixes are preserved at build time; Safari only dropped the `-webkit-` prefix on `backdrop-filter` in 18.",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.2.4",
     date: "June 17, 2026",
     highlight:
       "Clearable button enabled by default on all pickers, read-only input mode for better UX, enhanced playground with live state display and TS/JS code toggle, improved modal compatibility.",
-    isLatest: true,
+    isLatest: false,
     sections: [
       {
         kind: "added",
@@ -665,7 +715,7 @@ export function App() {
         <header className="pg-hero">
           <div className="pg-tag">
             <span className="pg-tag-dot" />
-            v1.2.4 · TypeScript · Tailwind · 6 pickers
+            v1.3.0 · TypeScript · Tailwind · 6 pickers
           </div>
 
           <h1 className="pg-title">
@@ -1912,7 +1962,11 @@ export function App() {
 
       {/* ============ CUSTOMIZER MODAL ============ */}
       {customizer && (
-        <Customizer kind={customizer} onClose={() => setCustomizer(null)} />
+        <Customizer
+          kind={customizer}
+          onClose={() => setCustomizer(null)}
+          dark={dark}
+        />
       )}
 
       {/* ============ SCROLL TO TOP ============ */}

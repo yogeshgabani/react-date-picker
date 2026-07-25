@@ -39,8 +39,19 @@
   --rdk-scroll-thumb-hover: rgba(124, 58, 237, 0.55);
 }
 
+/* Auto theme (the default, and what a fresh install gets): follow the
+   browser's `prefers-color-scheme`. Declared on :root at plain (0,1,0)
+   specificity so a host's own `:root { --rdk-color-*: … }` branding still
+   wins — the previous `:root:not([data-rdk-theme="light"])` selector was
+   (0,2,0) and silently beat host overrides whenever the OS was dark.
+
+   ORDER MATTERS: the explicit light/dark blocks below must stay AFTER this
+   one. A theme switcher that sets `data-rdk-theme` on <html> targets the
+   very same element as `:root`, so the two rules tie on specificity and the
+   later one wins — put the light block first and an explicitly-light page
+   would snap back to dark as soon as the OS preference was dark. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-rdk-theme="light"]) {
+  :root {
     --rdk-color-primary: #a78bfa;
     --rdk-color-primary-hover: #c4b5fd;
     --rdk-color-primary-soft: #2e1065;
@@ -58,6 +69,30 @@
     --rdk-scroll-thumb: rgba(167, 139, 250, 0.28);
     --rdk-scroll-thumb-hover: rgba(167, 139, 250, 0.55);
   }
+}
+
+/* Explicit light theme — `theme="light"` on a picker, or `data-rdk-theme`
+   on any ancestor. Without this block an explicitly-light picker on a
+   dark-scheme page had no light tokens of its own and just inherited the
+   dark ones. */
+[data-rdk-theme="light"] {
+  --rdk-color-primary: #7c3aed;
+  --rdk-color-primary-hover: #6d28d9;
+  --rdk-color-primary-soft: #f3e8ff;
+  --rdk-color-bg: #fafafa;
+  --rdk-color-surface: #ffffff;
+  --rdk-color-surface-hover: #f5f3ff;
+  --rdk-color-text: #18181b;
+  --rdk-color-text-muted: #71717a;
+  --rdk-color-border: #e4e4e7;
+  --rdk-color-border-strong: #d4d4d8;
+  --rdk-color-danger: #ef4444;
+  --rdk-color-disabled: #d4d4d8;
+  --rdk-color-range-bg: #f3e8ff;
+
+  --rdk-scroll-track: rgba(124, 58, 237, 0.04);
+  --rdk-scroll-thumb: rgba(124, 58, 237, 0.32);
+  --rdk-scroll-thumb-hover: rgba(124, 58, 237, 0.55);
 }
 
 [data-rdk-theme="dark"] {
@@ -109,6 +144,28 @@
   outline: 0;
 }
 
+/* ============================================================
+   Dropdown panel surface.
+
+   `--rdk-color-popover` is deliberately NOT declared in the token
+   blocks above: a `--rdk-color-popover: var(--rdk-color-surface)`
+   declaration on :root would be substituted against the :root
+   surface and inherit that resolved colour down, so a picker with
+   its own `data-rdk-theme` would keep the page-level background.
+   Using the fallback at the point of use resolves against whatever
+   surface is in scope for *this* element instead.
+
+   Both custom properties default to unset, so a picker that doesn't
+   opt in paints exactly as before and never pays for a backdrop
+   filter (any value other than `none` creates a containing block
+   and a stacking context).
+   ============================================================ */
+.rdk-popover-surface {
+  background-color: var(--rdk-color-popover, var(--rdk-color-surface));
+  -webkit-backdrop-filter: var(--rdk-popover-backdrop, none);
+  backdrop-filter: var(--rdk-popover-backdrop, none);
+}
+
 /* RTL support */
 [dir="rtl"] .rdk-flip-x {
   transform: scaleX(-1);
@@ -128,45 +185,62 @@
 }
 
 /* ============================================================
-   Themed scrollbars — scoped strictly to picker descendants
-   (anything inside an element carrying the `data-rdk-theme`
-   attribute). The library never styles host-page scrollbars,
-   so apps that mount the picker don't see any global leakage.
+   Themed scrollbars — scoped strictly to picker descendants.
+   The library never styles host-page scrollbars, so apps that
+   mount the picker don't see any global leakage.
+
+   The scope matches the reset above: `data-rdk-theme` is only
+   emitted for an explicit light/dark theme, so scoping on it
+   alone left the default (`theme="auto"`) picker — i.e. what
+   anyone gets on a fresh install — with unstyled native
+   scrollbars. `.rdk-font-rdk` is present on every picker root
+   and popover surface, so it covers all three theme modes.
+   `:where()` keeps the whole selector at specificity 0 so the
+   per-component overrides below still win.
    ============================================================ */
 
 /* Firefox */
-[data-rdk-theme] *,
-[data-rdk-theme] {
+:where(.rdk-font-rdk, [data-rdk-theme]) *,
+:where(.rdk-font-rdk, [data-rdk-theme]) {
   scrollbar-width: thin;
   scrollbar-color: var(--rdk-scroll-thumb) var(--rdk-scroll-track);
 }
 
 /* WebKit / Blink (Chrome, Edge, Safari) */
-[data-rdk-theme] *::-webkit-scrollbar,
-[data-rdk-theme]::-webkit-scrollbar {
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
-[data-rdk-theme] *::-webkit-scrollbar-track,
-[data-rdk-theme]::-webkit-scrollbar-track {
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-track,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-track {
   background: var(--rdk-scroll-track);
   border-radius: 999px;
 }
-[data-rdk-theme] *::-webkit-scrollbar-thumb,
-[data-rdk-theme]::-webkit-scrollbar-thumb {
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-thumb,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-thumb {
   background: var(--rdk-scroll-thumb);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
   transition: background 0.2s ease;
 }
-[data-rdk-theme] *::-webkit-scrollbar-thumb:hover,
-[data-rdk-theme]::-webkit-scrollbar-thumb:hover {
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-thumb:hover,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-thumb:hover {
   background: var(--rdk-scroll-thumb-hover);
   background-clip: padding-box;
 }
-[data-rdk-theme] *::-webkit-scrollbar-corner,
-[data-rdk-theme]::-webkit-scrollbar-corner {
+/* Declaring any ::-webkit-scrollbar rule switches Blink/WebKit to custom
+   scrollbar rendering, which brings back the platform stepper arrows at
+   both ends of the track unless they are explicitly removed. */
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-button,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-corner,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-corner {
   background: transparent;
 }
 

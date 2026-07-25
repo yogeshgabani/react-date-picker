@@ -2484,11 +2484,42 @@ body[data-theme='dark'] .pg-cz-select optgroup {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px 14px;
 }
+.pg-cz-colors-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pg-border);
+}
+.pg-cz-colors-sub-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--pg-text-mute);
+}
+.pg-cz-colors-sub-hint {
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--pg-text-mute);
+}
+.pg-cz-colors-sub + .pg-cz-colors-grid {
+  margin-top: 10px;
+}
 .pg-cz-color {
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+}
+/* Range inputs sit in the same grid cell shape as a ColorField, so give
+   them the swatch row's height instead of the browser default. */
+.pg-cz-color > input[type="range"] {
+  width: 100%;
+  height: 30px;
+  accent-color: var(--rdk-color-primary, #7c3aed);
+  cursor: pointer;
 }
 .pg-cz-color-label {
   display: flex;

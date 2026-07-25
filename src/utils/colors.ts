@@ -7,6 +7,8 @@ const VAR_MAP: Record<keyof PickerColors, string> = {
   primarySoft: '--rdk-color-primary-soft',
   background: '--rdk-color-bg',
   surface: '--rdk-color-surface',
+  popover: '--rdk-color-popover',
+  popoverBlur: '--rdk-popover-backdrop',
   surfaceHover: '--rdk-color-surface-hover',
   text: '--rdk-color-text',
   textMuted: '--rdk-color-text-muted',
@@ -33,7 +35,10 @@ export function colorsToCssVars(
   for (const key of Object.keys(colors) as Array<keyof PickerColors>) {
     const v = colors[key];
     if (typeof v === 'string' && v.length > 0) {
-      out[VAR_MAP[key]] = v;
+      // `popoverBlur` feeds a filter list, not a colour. Accept the common
+      // shorthand (a bare length) as well as a full filter function.
+      out[VAR_MAP[key]] =
+        key === 'popoverBlur' && !v.includes('(') ? `blur(${v})` : v;
       any = true;
     }
   }

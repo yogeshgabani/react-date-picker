@@ -116,6 +116,10 @@ export function MonthGrid({
             const today = isToday(date);
             const focused = focusedDate && isSameDay(focusedDate, date);
             const isRangeEdge = !!(isRangeStart || isRangeEnd);
+            // Only mark today when it's actually the cell's dominant state —
+            // selected / range edges paint their own fill, and a disabled today
+            // should read as disabled.
+            const isTodayCell = today && !isSelected && !isRangeEdge && !disabled;
 
             const defaultNode = (
               <span className="rdk-relative rdk-z-10">{date.getDate()}</span>
@@ -146,7 +150,10 @@ export function MonthGrid({
                   className={cn(
                     'rdk-relative rdk-h-9 rdk-w-9 rdk-flex rdk-items-center rdk-justify-center rdk-text-sm rdk-font-medium rdk-rounded-full rdk-transition-all rdk-duration-200 focus:rdk-outline-none',
                     !inCurrentMonth && 'rdk-text-rdk-text-muted/40',
-                    inCurrentMonth && !disabled && 'rdk-text-rdk-text',
+                    // `text-rdk-text` is emitted after `text-rdk-primary` in the
+                    // generated sheet, so it would otherwise win the cascade and
+                    // repaint today's number in the plain body colour.
+                    inCurrentMonth && !disabled && !isTodayCell && 'rdk-text-rdk-text',
                     disabled && 'rdk-text-rdk-disabled rdk-cursor-not-allowed rdk-line-through rdk-decoration-1',
                     !disabled &&
                       !isSelected &&
@@ -159,10 +166,12 @@ export function MonthGrid({
                     isPreviewEnd &&
                       !isSelected &&
                       'rdk-ring-2 rdk-ring-rdk-primary/40 rdk-ring-inset',
-                    today &&
-                      !isSelected &&
-                      !isRangeEdge &&
-                      'rdk-font-bold rdk-text-rdk-primary rdk-ring-2 rdk-ring-rdk-primary/60 rdk-ring-inset rdk-bg-rdk-primary-soft/40',
+                    // Solid ring colour on purpose: `ring-2` alone falls back to
+                    // Tailwind's default blue `--tw-ring-color` (preflight, which
+                    // would define it, is disabled for this library), so the ring
+                    // must always name a theme token explicitly.
+                    isTodayCell &&
+                      'rdk-font-bold rdk-text-rdk-primary rdk-ring-2 rdk-ring-rdk-primary rdk-ring-inset rdk-bg-rdk-primary-soft/40',
                     focused &&
                       !isSelected &&
                       !isRangeEdge &&

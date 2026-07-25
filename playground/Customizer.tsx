@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import {
   DatePicker,
   DateRangePicker,
@@ -48,6 +54,12 @@ type Config = {
   disablePast: boolean;
   disableFuture: boolean;
   colors: PickerColors;
+  /** Dropdown-panel opacity in percent. 100 = fully opaque (no override). */
+  popoverAlpha: number;
+  /** Backdrop blur behind the dropdown panel, in px. 0 = off. */
+  popoverBlur: number;
+  /** Surface opacity in percent. Only applied once a Surface colour is set. */
+  surfaceAlpha: number;
 };
 
 /**
@@ -59,19 +71,66 @@ const COLOR_FIELDS: Array<{
   key: keyof PickerColors;
   label: string;
   hint: string;
-  rangeOnly?: boolean;
+  /** Hide the field for kinds where the token isn't painted at all. */
+  showFor?: (k: PickerKind) => boolean;
 }> = [
   { key: 'primary', label: 'Primary', hint: 'Selected day / Today button' },
   { key: 'primaryHover', label: 'Primary hover', hint: 'Hover state of primary' },
   { key: 'primarySoft', label: 'Primary soft', hint: 'Day-hover background' },
-  { key: 'surface', label: 'Surface', hint: 'Popover background' },
-  { key: 'background', label: 'Background', hint: 'Footer / muted surface' },
+  { key: 'surface', label: 'Surface', hint: 'Panels, inputs, time columns' },
+  {
+    key: 'background',
+    label: 'Background',
+    hint: 'Today / Clear footer bar',
+    // `--rdk-color-bg` is painted on exactly one element: the footer bar in
+    // DatePicker and DateRangePicker. Offering it elsewhere just looks broken
+    // — the swatch changes and nothing on screen moves.
+    showFor: (k) => k === 'date' || k === 'date-range',
+  },
   { key: 'text', label: 'Text', hint: 'Primary text' },
   { key: 'textMuted', label: 'Text muted', hint: 'Weekday labels' },
   { key: 'border', label: 'Border', hint: 'Dividers & outlines' },
   { key: 'danger', label: 'Danger', hint: 'Clear button hover' },
-  { key: 'rangeBg', label: 'Range band', hint: 'Between start & end', rangeOnly: true },
+  {
+    key: 'rangeBg',
+    label: 'Range band',
+    hint: 'Between start & end',
+    // Inlined rather than referencing `isRange`, which is declared further
+    // down the module — a bare reference here runs in its temporal dead zone.
+    showFor: (k) => k.endsWith('-range'),
+  },
 ];
+
+/**
+ * Apply a percentage alpha to any CSS colour. A 6-digit hex becomes
+ * `rgb(r g b / n%)`; anything else (a `var()`, an existing `rgba()`, a
+ * keyword) goes through `color-mix`, which handles them all without the
+ * Customizer having to parse colour syntax.
+ */
+function withAlpha(color: string, percent: number): string {
+  const hex = /^#([0-9a-fA-F]{6})$/.exec(color.trim());
+  if (hex) {
+    const n = parseInt(hex[1], 16);
+    // eslint-disable-next-line no-bitwise
+    return `rgb(${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255} / ${percent}%)`;
+  }
+  return `color-mix(in srgb, ${color} ${percent}%, transparent)`;
+}
+
+/**
+ * Blend a colour over an opaque base instead of over transparency.
+ *
+ * Surface paints the panel the dates sit on, so making it *translucent*
+ * would let whatever is behind the popover — page cards, other controls —
+ * read straight through the calendar. Mixing over the theme's own surface
+ * keeps the panel opaque and just tints it, which is what actually makes a
+ * saturated pick legible. The base has to be a literal: writing
+ * `color-mix(…, var(--rdk-color-surface))` into `--rdk-color-surface` is a
+ * self-reference, and CSS throws the whole property away as invalid.
+ */
+function withTint(color: string, percent: number, base: string): string {
+  return `color-mix(in srgb, ${color} ${percent}%, ${base})`;
+}
 
 const DEFAULTS: Config = {
   size: 'md',
@@ -99,6 +158,12 @@ const DEFAULTS: Config = {
   disablePast: false,
   disableFuture: false,
   colors: {},
+  popoverAlpha: 100,
+  popoverBlur: 0,
+  // Surface paints the whole panel, so a saturated colour at full strength
+  // buries the dates in it. Start as a light tint — the slider goes to 100%
+  // for anyone who does want a solid block.
+  surfaceAlpha: 15,
 };
 
 const COMPONENT_NAME: Record<PickerKind, string> = {
@@ -152,9 +217,12 @@ const FORMAT_PRESETS_DATETIME = [
 export function Customizer({
   kind,
   onClose,
+  dark,
 }: {
   kind: PickerKind;
   onClose: () => void;
+  /** Active site theme — decides what a Surface tint is blended over. */
+  dark: boolean;
 }) {
   const [cfg, setCfg] = useState<Config>(DEFAULTS);
   const [vDate, setVDate] = useState<Date | null>(null);
@@ -232,9 +300,39 @@ export function Customizer({
         anyColor = true;
       }
     }
+    // Surface covers every panel, so it is the one colour where a full-strength
+    // pick makes the picker unreadable — dark text buried in a dark fill.
+    if (activeColors.surface?.trim() && cfg.surfaceAlpha < 100) {
+      activeColors.surface = withTint(
+        activeColors.surface,
+        cfg.surfaceAlpha,
+        dark ? '#18181b' : '#ffffff',
+      );
+    }
+
+    // Dropdown panel. The alpha slider composes a translucent colour out of
+    // whatever base is in play: the picked colour when there is one, and the
+    // live theme surface when there isn't — so lowering opacity alone still
+    // reads as "the system background, just see-through". At 100% with no
+    // colour picked we emit nothing at all and the library falls back to
+    // `--rdk-color-surface` on its own.
+    const alpha = cfg.popoverAlpha;
+    const base = activeColors.popover?.trim();
+    if (base || alpha < 100) {
+      const source = base || 'var(--rdk-color-surface)';
+      activeColors.popover =
+        alpha >= 100
+          ? source
+          : withAlpha(source, alpha);
+      anyColor = true;
+    }
+    if (cfg.popoverBlur > 0) {
+      activeColors.popoverBlur = `${cfg.popoverBlur}px`;
+      anyColor = true;
+    }
     if (anyColor) p.colors = activeColors;
     return p;
-  }, [cfg, kind]);
+  }, [cfg, kind, dark]);
 
   const setColor = (key: keyof PickerColors, value: string) =>
     setCfg((p) => {
@@ -244,10 +342,20 @@ export function Customizer({
       return { ...p, colors: next };
     });
 
-  const resetColors = () => setCfg((p) => ({ ...p, colors: {} }));
-  const colorFields = COLOR_FIELDS.filter(
-    (f) => !f.rangeOnly || isRange(kind),
-  );
+  const resetColors = () =>
+    setCfg((p) => ({
+      ...p,
+      colors: {},
+      popoverAlpha: DEFAULTS.popoverAlpha,
+      popoverBlur: DEFAULTS.popoverBlur,
+      surfaceAlpha: DEFAULTS.surfaceAlpha,
+    }));
+  const colorsDirty =
+    Object.keys(cfg.colors).length > 0 ||
+    cfg.popoverAlpha !== DEFAULTS.popoverAlpha ||
+    cfg.popoverBlur !== DEFAULTS.popoverBlur ||
+    cfg.surfaceAlpha !== DEFAULTS.surfaceAlpha;
+  const colorFields = COLOR_FIELDS.filter((f) => !f.showFor || f.showFor(kind));
 
   const previewEl = (() => {
     switch (kind) {
@@ -636,21 +744,70 @@ export function Customizer({
                 type="button"
                 className="pg-cz-colors-reset"
                 onClick={resetColors}
-                disabled={Object.keys(cfg.colors).length === 0}
+                disabled={!colorsDirty}
               >
                 Reset
               </button>
             </div>
             <div className="pg-cz-colors-grid">
               {colorFields.map(({ key, label, hint }) => (
-                <ColorField
-                  key={key}
-                  label={label}
-                  hint={hint}
-                  value={cfg.colors[key] ?? ''}
-                  onChange={(v) => setColor(key, v)}
-                />
+                <Fragment key={key}>
+                  <ColorField
+                    label={label}
+                    hint={hint}
+                    value={cfg.colors[key] ?? ''}
+                    onChange={(v) => setColor(key, v)}
+                  />
+                  {key === 'surface' ? (
+                    <RangeField
+                      label={`Surface tint · ${cfg.surfaceAlpha}%`}
+                      hint="Blended over the theme background"
+                      min={5}
+                      max={100}
+                      step={5}
+                      value={cfg.surfaceAlpha}
+                      onChange={(v) =>
+                        setCfg((p) => ({ ...p, surfaceAlpha: v }))
+                      }
+                    />
+                  ) : null}
+                </Fragment>
               ))}
+            </div>
+
+            <div className="pg-cz-colors-sub">
+              <span className="pg-cz-colors-sub-title">Dropdown panel</span>
+              <span className="pg-cz-colors-sub-hint">
+                Floating popover only — inline panels and the input keep using
+                Surface. Leave the colour empty to keep the system background
+                and just dial its opacity.
+              </span>
+            </div>
+            <div className="pg-cz-colors-grid">
+              <ColorField
+                label="Dropdown background"
+                hint="Defaults to Surface"
+                value={cfg.colors.popover ?? ''}
+                onChange={(v) => setColor('popover', v)}
+              />
+              <RangeField
+                label={`Opacity · ${cfg.popoverAlpha}%`}
+                hint="See-through — pair with blur"
+                min={10}
+                max={100}
+                step={5}
+                value={cfg.popoverAlpha}
+                onChange={(v) => setCfg((p) => ({ ...p, popoverAlpha: v }))}
+              />
+              <RangeField
+                label={`Blur · ${cfg.popoverBlur}px`}
+                hint="Backdrop filter behind the panel"
+                min={0}
+                max={24}
+                step={2}
+                value={cfg.popoverBlur}
+                onChange={(v) => setCfg((p) => ({ ...p, popoverBlur: v }))}
+              />
             </div>
           </div>
         </div>
@@ -762,6 +919,43 @@ function Toggle({
     >
       <span className="pg-cz-toggle-thumb" />
     </button>
+  );
+}
+
+/** A slider shaped like a ColorField so it drops into the same grid. */
+function RangeField({
+  label,
+  hint,
+  min,
+  max,
+  step,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="pg-cz-color">
+      <div className="pg-cz-color-label">
+        <span className="pg-cz-color-name">{label}</span>
+        <span className="pg-cz-color-hint">{hint}</span>
+      </div>
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+      />
+    </div>
   );
 }
 

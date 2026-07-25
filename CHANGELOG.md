@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-07-25
+
+### Added
+- **`colors.popover`** — background for the floating dropdown panel only, leaving `surface` (inline panels, time columns, input) untouched. Accepts any CSS colour, including translucent ones like `rgb(24 24 27 / 0.72)`. Defaults to `surface`.
+- **`colors.popoverBlur`** — backdrop blur behind the dropdown, e.g. `'14px'`. A bare length is wrapped in `blur()`; a full filter list such as `'blur(14px) saturate(160%)'` is passed through. Both new keys default to unset, so a picker that doesn't opt in renders exactly as before and never pays for a backdrop filter.
+
+### Fixed
+- **Dropdown rendered in the wrong theme** — the popover is portaled to `document.body`, so it sat outside the picker's `data-rdk-theme` scope. Its shell resolved the page-level tokens while its children resolved the picker's, which on a `theme="dark"` picker in a light browser produced a white calendar with a dark time panel, and made today's date invisible. The shell now carries the theme scope itself.
+- **`theme="light"` had no effect** — no CSS ever declared the light tokens for `[data-rdk-theme="light"]`, so an explicitly-light picker on a dark-scheme page just inherited the dark values. Light tokens are now declared, and are ordered after the `prefers-color-scheme` block so an explicit theme always beats the automatic one.
+- **Host `:root` colour overrides ignored in dark mode** — the auto-theme selector was `:root:not([data-rdk-theme="light"])` (specificity 0,2,0) and silently beat a consumer's own `:root { --rdk-color-*: … }` branding. It is now plain `:root`.
+- **Every opacity-modifier utility was missing from the stylesheet** — theme tokens were bare `var(--rdk-color-*)` strings, which Tailwind cannot inject alpha into, so it dropped `bg-rdk-primary-soft/40`, `ring-rdk-primary/60` and eight others entirely. Tokens are now alpha-capable via `color-mix`; un-modified utilities emit the same plain `var()` as before.
+- **Today's date was unreadable** — its ring fell back to Tailwind's default blue (preflight, which would define `--tw-ring-color`, is disabled for this library) and its soft fill was one of the dropped utilities. It now uses a solid themed ring, and `text-rdk-text` no longer overrides the primary colour it is meant to show.
+- **Scrollbar arrows and unstyled scrollbars** — declaring any `::-webkit-scrollbar` rule switches Blink/WebKit to custom rendering, which restores the platform stepper arrows unless they are removed explicitly. The scrollbar styles were also scoped to `[data-rdk-theme]`, an attribute only emitted for an explicit light/dark theme — so a default `theme="auto"` picker, i.e. what a fresh install gets, had no scrollbar theming at all.
+
+### Changed
+- `theme="auto"` now emits `data-rdk-theme="auto"` so host CSS can target it. No token block is attached, so the picker still follows `prefers-color-scheme`.
+- `TimePanel` no longer paints its own background — it always sits on a surface already, and the duplicate fill punched through a translucent `colors.popover`.
+- Hand-written vendor prefixes are preserved at build time (`autoprefixer: { remove: false }`); Safari only dropped the `-webkit-` prefix on `backdrop-filter` in 18.
+
+### Playground
+- Customizer gained a **Dropdown panel** section — background colour, opacity and blur. Leaving the colour empty and lowering opacity keeps the system background and just makes it see-through.
+- Customizer gained a **Surface tint** slider (default 15%). Surface paints every panel, so a saturated pick at full strength buried the dates in it. The tint is blended over the theme background rather than over transparency, so the panel stays opaque and nothing bleeds through the calendar.
+- The **Background** colour field is now hidden for pickers that never paint `--rdk-color-bg` — it only backs the Today/Clear footer bar in `DatePicker` and `DateRangePicker`, so on the other four it changed nothing.
+
 ## [1.2.4] - 2026-06-18
 
 ### Fixed
@@ -155,7 +179,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status | Key Features |
 |---------|------|--------|--------------|
-| 1.2.4 | 2026-06-18 | Latest | Keyboard input constraints, time auto-snap |
+| 1.3.0 | 2026-07-25 | Latest | Dropdown background & blur, popover theme scoping fixes |
+| 1.2.4 | 2026-06-18 | Stable | Keyboard input constraints, time auto-snap |
 | 1.2.3 | 2026-06-18 | Stable | Time range picker constraints |
 | 1.2.2 | 2026-06-18 | Stable | React warnings fix, focus ring improvements |
 | 1.2.1 | 2026-06-18 | Stable | Version alignment |
