@@ -183,6 +183,12 @@ export interface DatePickerProps extends BaseDateProps {
   view?: CalendarView;
 }
 
+export interface MultiDatePickerProps extends BaseDateProps {
+  value?: Date[];
+  defaultValue?: Date[];
+  onChange?: (dates: Date[]) => void;
+}
+
 export interface DateRangePickerProps extends BaseDateProps {
   value?: DateRange;
   defaultValue?: DateRange;

@@ -2,9 +2,12 @@
 
 # react-datetime-kit
 
-A modern, accessible, **headless-inside / pretty-outside** date &amp; time picker toolkit for React. Six picker variants share one API, one theming model, and one keyboard-/screen-reader–friendly core.
+A modern, accessible, **headless-inside / pretty-outside** date &amp; time picker toolkit for React. Seven picker variants share one API, one theming model, and one keyboard-/screen-reader–friendly core.
 
 [![npm](https://img.shields.io/npm/v/react-datetime-kit.svg?color=4f46e5&style=flat-square)](https://www.npmjs.com/package/react-datetime-kit)
+[![downloads](https://img.shields.io/npm/dm/react-datetime-kit.svg?color=06b6d4&style=flat-square)](https://www.npmjs.com/package/react-datetime-kit)
+[![minzipped size](https://img.shields.io/bundlephobia/minzip/react-datetime-kit?color=f59e0b&style=flat-square)](https://bundlephobia.com/package/react-datetime-kit)
+[![stars](https://img.shields.io/github/stars/yogeshgabani/react-datetime-kit?color=eab308&style=flat-square)](https://github.com/yogeshgabani/react-datetime-kit)
 [![types](https://img.shields.io/badge/types-included-3178c6?style=flat-square)](#typescript)
 [![license](https://img.shields.io/badge/license-MIT-emerald?style=flat-square)](./LICENSE)
 [![bundle](https://img.shields.io/badge/tree--shakable-✓-10b981?style=flat-square)](#performance)
@@ -16,7 +19,7 @@ A modern, accessible, **headless-inside / pretty-outside** date &amp; time picke
 **👉 [react-datetime-picker.netlify.app](https://react-datetime-picker.netlify.app/)**
 
 ```
-DatePicker · DateRangePicker · TimePicker · TimeRangePicker
+DatePicker · MultiDatePicker · DateRangePicker · TimePicker · TimeRangePicker
 DateTimePicker · DateTimeRangePicker
 ```
 
@@ -32,12 +35,28 @@ DateTimePicker · DateTimeRangePicker
 
 ---
 
+## Why react-datetime-kit?
+
+|                                                          | react-datetime-kit | react-datepicker | react-day-picker | MUI X Date Pickers        |
+| -------------------------------------------------------- | :-----------------: | :---------------: | :---------------: | :------------------------: |
+| 7 pickers in one package (date, multi-date, time, range, datetime) | ✅         | ❌ date/range only | ❌ day picker only | ✅                          |
+| Works with plain CSS / Tailwind — no UI framework lock-in | ✅                   | ✅                 | ✅                 | ❌ requires `@mui/material` |
+| Headless hooks for a fully custom UI                     | ✅                   | ❌                 | ❌                 | ❌                          |
+| CSS-variable theming, no theme config object              | ✅                   | Partial (SCSS)     | Partial (classNames) | Theme object (JS)        |
+| Moment-style format tokens (`DD/MM/YYYY`)                | ✅                   | ❌                 | ❌                 | ❌                          |
+| Built-in range presets sidebar                           | ✅                   | ❌                 | ❌                 | Pro tier only              |
+| TypeScript-first                                         | ✅                   | ✅                 | ✅                 | ✅                          |
+
+---
+
 ## Table of contents
 
+- [Why react-datetime-kit?](#why-react-datetime-kit)
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [Pickers](#pickers)
   - [`DatePicker`](#datepicker)
+  - [`MultiDatePicker`](#multidatepicker)
   - [`DateRangePicker`](#daterangepicker)
   - [`TimePicker`](#timepicker)
   - [`TimeRangePicker`](#timerangepicker)
@@ -142,6 +161,31 @@ import { DatePicker } from "react-datetime-kit";
   /* Inline / always-open variant */
 }
 <DatePicker inline value={date} onChange={setDate} />;
+```
+
+### `MultiDatePicker`
+
+Select several independent, non-contiguous dates. Clicking a day **toggles** it in/out of the selection instead of replacing the value, so the popover stays open across clicks — close it with the **Done** button, click-outside, or `Escape`.
+
+> **Default differs from every other picker:** `disablePast` defaults to `true` here (past dates are disabled out of the box). Pass `disablePast={false}` to allow picking past dates.
+
+```tsx
+import { useState } from "react";
+import { MultiDatePicker } from "react-datetime-kit";
+
+const [dates, setDates] = useState<Date[]>([]);
+
+<MultiDatePicker
+  value={dates}
+  onChange={setDates}
+  clearable
+  placeholder="Select dates"
+/>;
+
+{
+  /* Allow past dates too */
+}
+<MultiDatePicker value={dates} onChange={setDates} disablePast={false} />;
 ```
 
 ### `DateRangePicker`
@@ -340,7 +384,7 @@ These props are shared by every picker.
 
 ## Date-picker props
 
-Apply to `DatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker`.
+Apply to `DatePicker`, `MultiDatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker`.
 
 | Prop              | Type                             | Default          | Description                                                                                                                                                                              |
 | ----------------- | -------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -911,6 +955,7 @@ function MyCustomPicker() {
 Available headless hooks:
 
 - `useDatePicker({ value, onChange, minDate, maxDate, disabledDates })`
+- `useMultiDatePicker({ value, onChange, minDate, maxDate, disabledDates })`
 - `useDateRange({ value, onChange, minDate, maxDate, disabledDates })`
 - `useTimePicker({ value, onChange })`
 - `useCalendarKeyboard({ onMove, onSelect, onCancel })`
@@ -924,6 +969,7 @@ Everything is fully typed. The most commonly imported types:
 ```ts
 import type {
   DatePickerProps,
+  MultiDatePickerProps,
   DateRangePickerProps,
   TimePickerProps,
   TimeRangePickerProps,

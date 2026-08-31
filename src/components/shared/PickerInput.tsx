@@ -61,13 +61,15 @@ export const PickerInput = forwardRef<HTMLInputElement, PickerInputProps>(
           rootClassName,
         )}
         style={
-          !invalid ? {
-            '--tw-ring-color': 'var(--rdk-color-primary)',
-            '--tw-ring-opacity': '0.2',
-          } as any : {
-            '--tw-ring-color': 'var(--rdk-color-danger)',
-            '--tw-ring-opacity': '0.15',
-          } as any
+          (!invalid
+            ? {
+                '--tw-ring-color': 'var(--rdk-color-primary)',
+                '--tw-ring-opacity': '0.2',
+              }
+            : {
+                '--tw-ring-color': 'var(--rdk-color-danger)',
+                '--tw-ring-opacity': '0.15',
+              }) as React.CSSProperties
         }
       >
         {iconPosition === 'left' ? iconNode : null}

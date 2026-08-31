@@ -8,6 +8,7 @@ import {
 } from "react";
 import {
   DatePicker,
+  MultiDatePicker,
   DateRangePicker,
   TimePicker,
   TimeRangePicker,
@@ -19,7 +20,7 @@ import { Customizer, type PickerKind } from "./Customizer";
 
 type Category = "all" | "date" | "range" | "time" | "datetime" | "theming";
 
-const SITE_LAST_UPDATED = "July 25, 2026";
+const SITE_LAST_UPDATED = "August 31, 2026";
 const STATS_NAMESPACE = "react-datetime-kit-playground";
 const SESSION_VISIT_FLAG = "rdtk_visited";
 const THEME_STORAGE_KEY = "rdtk-theme-pref";
@@ -41,11 +42,37 @@ type ChangelogEntry = {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "1.4.0",
+    date: "August 31, 2026",
+    highlight:
+      "A new 7th picker — MultiDatePicker — for selecting several independent, non-contiguous dates. Clicking a day toggles it in/out of the selection instead of replacing the value, so the popover stays open across clicks.",
+    isLatest: true,
+    sections: [
+      {
+        kind: "added",
+        title: "Added",
+        items: [
+          "**`MultiDatePicker`** — toggle any number of independent dates on/off; selections are kept sorted chronologically regardless of click order. Close the popover with the new **Done** button, click-outside, or `Escape`.",
+          "**`useMultiDatePicker`** headless hook — same `visibleMonth`/`focusedDate`/`moveFocus` shape as `useDatePicker`, plus `toggleDate`/`isSelected` for an array of dates.",
+          "**`MultiDatePickerProps`** type export.",
+        ],
+      },
+      {
+        kind: "changed",
+        title: "Changed",
+        items: [
+          "Unlike every other picker in the library, `MultiDatePicker` defaults `disablePast` to `true` — past dates are disabled out of the box. Pass `disablePast={false}` to opt out.",
+          "`Calendar`/`MonthGrid` gained an additive `selectedDates?: Date[]` prop (with `aria-multiselectable` wired up); existing `DatePicker`/`DateRangePicker` usage is unaffected.",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.3.0",
     date: "July 25, 2026",
     highlight:
       "Dropdown panels get their own background colour, opacity and backdrop blur. Plus a round of theming fixes: the portaled popover now carries the picker's theme, theme=\"light\" actually works, today's date is visible again, and scrollbars lost their stepper arrows.",
-    isLatest: true,
+    isLatest: false,
     sections: [
       {
         kind: "added",
@@ -525,6 +552,7 @@ export function App() {
   const [dateEmpty, setDateEmpty] = useState<Date | null>(null);
   const [dateInline, setDateInline] = useState<Date | null>(new Date());
   const [dateWide, setDateWide] = useState<Date | null>(new Date());
+  const [multiDates, setMultiDates] = useState<Date[]>([]);
 
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   const [rangePresets, setRangePresets] = useState<DateRange>({
@@ -715,7 +743,7 @@ export function App() {
         <header className="pg-hero">
           <div className="pg-tag">
             <span className="pg-tag-dot" />
-            v1.3.0 · TypeScript · Tailwind · 6 pickers
+            v1.4.0 · TypeScript · Tailwind · 7 pickers
           </div>
 
           <h1 className="pg-title">
@@ -806,8 +834,8 @@ export function App() {
           <div className="pg-feature-grid">
             <Feature
               icon="📅"
-              title="6 picker variants"
-              desc="Date, range, time, time-range, datetime, datetime-range — same API, same theming."
+              title="7 picker variants"
+              desc="Date, multi-date, range, time, time-range, datetime, datetime-range — same API, same theming."
             />
             <Feature
               icon="♿"
@@ -991,6 +1019,30 @@ export function App() {
                     value={dateInline}
                     onChange={setDateInline}
                     inline
+                  />
+                </Demo>
+
+                <Demo
+                  title="MultiDatePicker"
+                  hint="Toggle several independent dates — past dates disabled by default"
+                  badge="Date"
+                  code={`const [multiDates, setMultiDates] = useState<Date[]>([]);
+
+<MultiDatePicker
+  value={multiDates}
+  onChange={setMultiDates}
+  clearable
+/>`}
+                  value={
+                    multiDates.length
+                      ? `${multiDates.length} date(s): ${multiDates.map((d) => d.toDateString()).join(", ")}`
+                      : "[]"
+                  }
+                >
+                  <MultiDatePicker
+                    value={multiDates}
+                    onChange={setMultiDates}
+                    clearable
                   />
                 </Demo>
               </>

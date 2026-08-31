@@ -13,6 +13,8 @@ export interface MonthGridProps {
   focusedDate?: Date;
   /** Currently selected date (single mode) */
   selectedDate?: Date | null;
+  /** Currently selected dates (multi-select mode) */
+  selectedDates?: Date[];
   /** Range start / end / hover for range mode */
   rangeStart?: Date | null;
   rangeEnd?: Date | null;
@@ -33,6 +35,7 @@ export function MonthGrid({
   locale,
   focusedDate,
   selectedDate,
+  selectedDates,
   rangeStart,
   rangeEnd,
   rangeHover,
@@ -66,6 +69,7 @@ export function MonthGrid({
     <div
       role="grid"
       aria-label={format(visibleMonth, 'MMMM yyyy', locale ? { locale } : undefined)}
+      aria-multiselectable={selectedDates ? true : undefined}
       className="rdk-px-3 rdk-pb-3"
     >
       <div
@@ -101,11 +105,13 @@ export function MonthGrid({
             const disabled = isDisabled?.(date) ?? false;
             const isSelected = selectedDate
               ? isSameDay(selectedDate, date)
-              : rangeStart && isSameDay(rangeStart, date)
-                ? true
-                : rangeEnd && isSameDay(rangeEnd, date)
+              : selectedDates
+                ? selectedDates.some((sd) => isSameDay(sd, date))
+                : rangeStart && isSameDay(rangeStart, date)
                   ? true
-                  : false;
+                  : rangeEnd && isSameDay(rangeEnd, date)
+                    ? true
+                    : false;
 
             const isRangeStart = rStart && isSameDay(rStart, date);
             const isRangeEnd = rEnd && isSameDay(rEnd, date);

@@ -1,6 +1,6 @@
 {
   "name": "react-datetime-kit",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Modern, accessible, customizable React date picker, time picker, date range picker, time range picker, datetime picker and datetime range picker — TypeScript-first, themeable, mobile-friendly, with keyboard navigation, ARIA support, RTL, i18n, dark mode and Moment-style format tokens.",
   "keywords": [
     "react",
@@ -102,7 +102,16 @@
     "next-js",
     "vite",
     "frontend",
-    "web"
+    "web",
+    "date-input",
+    "calendar-picker",
+    "inline-calendar",
+    "multi-date-picker",
+    "date-selector",
+    "range-selector",
+    "react-hook-form",
+    "react-19",
+    "react18"
   ],
   "homepage": "https://react-datetime-kit.netlify.app",
   "repository": {
@@ -148,7 +157,7 @@
     "build:site": "vite build --outDir ../dist-site --emptyOutDir",
     "preview:site": "vite preview --outDir ../dist-site",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx",
+    "lint": "eslint src",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"playground/**/*.{ts,tsx,html,css}\"",
     "pack:check": "npm pack --dry-run",
     "prepublishOnly": "npm run build"
@@ -162,11 +171,16 @@
     "@floating-ui/react": "^0.27.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.20",
     "date-fns": "^3.6.0",
+    "eslint": "^10.9.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.5",
+    "globals": "^17.11.0",
     "postcss": "^8.4.47",
     "postcss-cli": "^11.0.0",
     "react": "^18.3.1",
@@ -174,6 +188,7 @@
     "tailwindcss": "^3.4.13",
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
+    "typescript-eslint": "^8.68.0",
     "vite": "^5.4.0"
   }
 }

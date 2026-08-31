@@ -1,5 +1,6 @@
 // Components
 export { DatePicker } from './components/DatePicker';
+export { MultiDatePicker } from './components/MultiDatePicker';
 export { DateRangePicker } from './components/DateRangePicker';
 export { TimePicker } from './components/TimePicker';
 export { TimeRangePicker } from './components/TimeRangePicker';
@@ -8,6 +9,7 @@ export { DateTimeRangePicker } from './components/DateTimeRangePicker';
 
 // Headless hooks
 export { useDatePicker } from './hooks/useDatePicker';
+export { useMultiDatePicker } from './hooks/useMultiDatePicker';
 export { useDateRange } from './hooks/useDateRange';
 export { useTimePicker } from './hooks/useTimePicker';
 export { useControllableState } from './hooks/useControllableState';
@@ -35,6 +37,7 @@ export { DEFAULT_PRESETS } from './utils/presets';
 // Types
 export type {
   DatePickerProps,
+  MultiDatePickerProps,
   DateRangePickerProps,
   TimePickerProps,
   TimeRangePickerProps,

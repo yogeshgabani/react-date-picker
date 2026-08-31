@@ -16,6 +16,7 @@ interface CalendarProps {
 
   focusedDate?: Date;
   selectedDate?: Date | null;
+  selectedDates?: Date[];
   rangeStart?: Date | null;
   rangeEnd?: Date | null;
   rangeHover?: Date | null;
@@ -42,6 +43,7 @@ export function Calendar({
   locale,
   focusedDate,
   selectedDate,
+  selectedDates,
   rangeStart,
   rangeEnd,
   rangeHover,
@@ -129,6 +131,7 @@ export function Calendar({
             locale={locale}
             focusedDate={focusedDate}
             selectedDate={selectedDate}
+            selectedDates={selectedDates}
             rangeStart={rangeStart}
             rangeEnd={rangeEnd}
             rangeHover={rangeHover}

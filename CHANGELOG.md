@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-08-31
+
+### Added
+- **`MultiDatePicker`** — a new 7th picker for selecting several independent, non-contiguous dates. Clicking a day toggles it in/out of the selection instead of replacing the value, so the popover stays open across clicks; close it with the new **Done** button, click-outside, or `Escape`. Selected dates are kept sorted chronologically regardless of click order.
+  - New headless hook: `useMultiDatePicker({ value, onChange, minDate, maxDate, disabledDates })`, returning a `toggleDate`/`isSelected` API alongside the same `visibleMonth`/`focusedDate`/`moveFocus` shape as `useDatePicker`.
+  - New type: `MultiDatePickerProps`.
+  - Unlike every other picker in the library, `disablePast` defaults to `true` on `MultiDatePicker` — past dates are disabled out of the box. Pass `disablePast={false}` to opt out.
+  - The shared `Calendar`/`MonthGrid` primitives gained an additive `selectedDates?: Date[]` prop (with `aria-multiselectable` wired up) — existing `DatePicker`/`DateRangePicker` usage is unaffected.
+
 ## [1.3.0] - 2026-07-25
 
 ### Added
