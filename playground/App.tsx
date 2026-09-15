@@ -42,11 +42,46 @@ type ChangelogEntry = {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "1.5.0",
+    date: "September 15, 2026",
+    highlight:
+      "Scrollbars inside the picker are now tinted from your primary colour instead of the library's default violet, and the stepper arrows Chrome 121 had quietly reintroduced are gone.",
+    isLatest: true,
+    sections: [
+      {
+        kind: "added",
+        title: "Added",
+        items: [
+          "**`colors.scrollTrack` / `colors.scrollThumb` / `colors.scrollThumbHover`** — explicit per-instance scrollbar overrides, mapping to the existing `--rdk-scroll-*` variables. Leave them unset and the scrollbar derives from `colors.primary`.",
+          "**`--rdk-time-col-scrollbar`** — width of the time-column scrollbar, now a 4px hairline by default.",
+        ],
+      },
+      {
+        kind: "fixed",
+        title: "Fixed",
+        items: [
+          "**Scrollbars ignored `colors.primary`** — the scrollbar tokens were hard-coded to the default violet and declared on `:root`, so a picker branded with another colour kept a violet-grey scrollbar that read as the browser default. They now derive from whichever `--rdk-color-primary` is in scope.",
+          "**Stepper arrows on every scrollbar in the picker** — the stylesheet declared `scrollbar-width` / `scrollbar-color` alongside the `::-webkit-scrollbar` rules, which is the usual cross-browser advice. Since Chrome 121 that combination makes Blink ignore the `::-webkit-scrollbar` rules entirely and fall back to the Fluent scrollbar, arrows and all. The standard properties are now gated to engines that need them.",
+          "**Host pages could put the arrows back** — a consumer app with a global `* { scrollbar-width: thin }` pushed the picker onto the same standard-scrollbar path. Both properties are reset to `auto` inside the picker, at a specificity that outranks a bare `*` rule regardless of stylesheet order.",
+        ],
+      },
+      {
+        kind: "technical",
+        title: "Technical",
+        items: [
+          "The `primary` → scrollbar derivation resolves on the picker scope rather than on `:root`: a `color-mix(…, var(--rdk-color-primary) …)` declaration on `:root` is substituted against the *root* primary and inherits that resolved colour down, so a per-instance `colors` override could never reach it.",
+          "Browsers without `color-mix()` fall back to a neutral grey scrollbar via `@supports`.",
+          "The `::-webkit-scrollbar-button` reset now covers the directional (`:vertical` / `:start` / `:single-button` …) forms and is repeated at `.rdk-time-col` specificity.",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.4.0",
     date: "August 31, 2026",
     highlight:
       "A new 7th picker — MultiDatePicker — for selecting several independent, non-contiguous dates. Clicking a day toggles it in/out of the selection instead of replacing the value, so the popover stays open across clicks.",
-    isLatest: true,
+    isLatest: false,
     sections: [
       {
         kind: "added",
@@ -183,7 +218,7 @@ const CHANGELOG: ChangelogEntry[] = [
           "`disablePast` / `disableFuture` props — automatic min/max constraint shortcuts. Today remains selectable. Merge correctly with explicit `minDate`/`maxDate` (the tighter bound wins).",
           "`showIcon` prop (default `true`) — hide the leading calendar/clock icon entirely.",
           "`iconPosition` prop — `'left' | 'right'` to move the leading icon to the trailing edge.",
-          "Themed scrollbars inside picker popovers — thin 10px purple-tinted scrollbar driven by `--rdk-scroll-track` / `--rdk-scroll-thumb` / `--rdk-scroll-thumb-hover` variables. Scoped strictly to `[data-rdk-theme]` descendants so host-page scrollbars stay untouched. Time columns get a tighter 6px variant.",
+          "Themed scrollbars inside picker popovers — a thin scrollbar tinted from `colors.primary`, so branding the picker recolours its scrollbar too. Override explicitly with `colors.scrollTrack` / `scrollThumb` / `scrollThumbHover` (or the matching `--rdk-scroll-*` variables). Scoped strictly to picker descendants so host-page scrollbars stay untouched. Time columns get a tighter 4px variant.",
         ],
       },
       {
@@ -743,7 +778,7 @@ export function App() {
         <header className="pg-hero">
           <div className="pg-tag">
             <span className="pg-tag-dot" />
-            v1.4.0 · TypeScript · Tailwind · 7 pickers
+            v1.5.0 · TypeScript · Tailwind · 7 pickers
           </div>
 
           <h1 className="pg-title">
@@ -2267,7 +2302,7 @@ function convertTsToJs(ts: string): string {
       // Remove type annotations from useState
       line = line.replace(/useState<[^>]+>/g, 'useState');
       // Remove type annotations (: Type)
-      line = line.replace(/:\s*[A-Za-z<>,\s|?{}[\]]+(?=[,\)=;])/g, '');
+      line = line.replace(/:\s*[A-Za-z<>,\s|?{}[\]]+(?=[,)=;])/g, '');
       // Remove generic brackets < >
       line = line.replace(/<[^>]+>/g, '');
       // Remove 'as Type' casts

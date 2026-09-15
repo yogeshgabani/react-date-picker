@@ -507,6 +507,9 @@ function KitchenSink() {
         disabled: "#d4d4d8", //   disabled day color
         rangeBg: "#f3e8ff", //   between range start & end
         focus: "#7c3aed", //   focus ring (defaults to primary)
+        scrollTrack: "", //   scrollbar track  — defaults to  6% of primary
+        scrollThumb: "", //   scrollbar thumb  — defaults to 38% of primary
+        scrollThumbHover: "", // thumb hover    — defaults to 65% of primary
       }}
       // ─── icon ────────────────────────────────────────────────
       showIcon={true} // false → hide the leading icon
@@ -712,6 +715,12 @@ All visual styles are driven by **CSS variables**. Override them on `:root` (glo
   --rdk-color-disabled: #d4d4d8;
   --rdk-color-range-bg: #f3e8ff;
 
+  /* Scrollbar — all three optional. Unset means "derive from
+     --rdk-color-primary", so branding `primary` alone is enough. */
+  --rdk-scroll-track: rgb(124 58 237 / 0.06);
+  --rdk-scroll-thumb: rgb(124 58 237 / 0.38);
+  --rdk-scroll-thumb-hover: rgb(124 58 237 / 0.65);
+
   /* Dropdown panel — both optional; unset means "follow `surface`, no blur".
      Setting these on :root pins one value for every theme, so declare them
      inside your own light/dark blocks if they should follow the scheme. */
@@ -734,6 +743,55 @@ All visual styles are driven by **CSS variables**. Override them on `:root` (glo
     0 12px 24px -8px rgba(24, 24, 27, 0.08);
 }
 ```
+
+### Scrollbar color
+
+The scrollbar inside the picker — time columns, the presets list, any scrolling
+panel — is **tinted from your primary color automatically**. Set `primary` and
+the scrollbar follows; there is nothing else to wire up.
+
+```tsx
+<DateTimePicker colors={{ primary: "#e4572e" }} /> // orange picker, orange scrollbar
+```
+
+It is derived per instance, not globally, so two pickers on the same page with
+different `primary` values get different scrollbars. The defaults are a 6% tint
+for the track, 38% for the thumb and 65% for the thumb on hover.
+
+To pick the colors yourself instead, set them explicitly — per instance via
+`colors`, or globally via the CSS variables:
+
+```tsx
+<TimePicker
+  colors={{
+    primary: "#e4572e",
+    scrollTrack: "transparent",
+    scrollThumb: "rgb(228 87 46 / 0.5)",
+    scrollThumbHover: "#e4572e",
+  }}
+/>
+```
+
+```css
+:root {
+  --rdk-scroll-thumb: rgb(228 87 46 / 0.5);
+  --rdk-scroll-thumb-hover: #e4572e;
+}
+```
+
+The time columns use a thinner 4px hairline than the rest of the picker.
+Change it with `--rdk-time-col-scrollbar`:
+
+```css
+:root {
+  --rdk-time-col-scrollbar: 8px;
+}
+```
+
+Scrollbar styling is scoped strictly to picker descendants — the library never
+touches host-page scrollbars. Browsers without `color-mix()` support fall back
+to a neutral grey scrollbar; set the variables explicitly if you need to cover
+those too.
 
 ### Translucent dropdown
 
@@ -997,6 +1055,17 @@ Modern evergreen browsers (Chrome, Edge, Firefox, Safari — last two stable ver
 ## Changelog
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for the full release history.
+
+### What's new in `1.5.0` 🎨
+
+Scrollbars inside the picker follow your brand colour, and Chrome's stepper
+arrows are gone for good.
+
+- **Scrollbars derive from `colors.primary`** — set your brand colour and the time-column / preset-list scrollbar is tinted to match. Previously the scrollbar was hard-coded to the library's default violet, so a branded picker kept a violet-grey scrollbar that read as the browser default.
+- **New `colors.scrollTrack` / `scrollThumb` / `scrollThumbHover`** — explicit overrides when you don't want the derived tint. See [Scrollbar color](#scrollbar-color).
+- **Stepper arrows removed** — since Chrome 121, declaring `scrollbar-width` / `scrollbar-color` next to `::-webkit-scrollbar` rules (the usual cross-browser advice) makes Blink ignore the `::-webkit-scrollbar` rules entirely and render the Fluent scrollbar, arrows included. The standard properties are now gated to the engines that need them.
+- **Immune to host-page scrollbar CSS** — an app with a global `* { scrollbar-width: thin }` used to drag the picker onto that same arrow-bearing path. Not any more.
+- **Thinner time-column scrollbar** — 6px → a 4px hairline, adjustable with `--rdk-time-col-scrollbar`.
 
 ### What's new in `1.2.2` 🐛
 

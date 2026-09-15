@@ -33,10 +33,6 @@
   --rdk-shadow-lg: 0 24px 56px -16px rgba(124, 58, 237, 0.22),
     0 12px 24px -8px rgba(24, 24, 27, 0.08),
     0 0 0 1px rgba(124, 58, 237, 0.06);
-
-  --rdk-scroll-track: rgba(124, 58, 237, 0.04);
-  --rdk-scroll-thumb: rgba(124, 58, 237, 0.32);
-  --rdk-scroll-thumb-hover: rgba(124, 58, 237, 0.55);
 }
 
 /* Auto theme (the default, and what a fresh install gets): follow the
@@ -64,10 +60,6 @@
     --rdk-color-border-strong: #3f3f46;
     --rdk-color-disabled: #3f3f46;
     --rdk-color-range-bg: #2e1065;
-
-    --rdk-scroll-track: rgba(167, 139, 250, 0.04);
-    --rdk-scroll-thumb: rgba(167, 139, 250, 0.28);
-    --rdk-scroll-thumb-hover: rgba(167, 139, 250, 0.55);
   }
 }
 
@@ -89,10 +81,6 @@
   --rdk-color-danger: #ef4444;
   --rdk-color-disabled: #d4d4d8;
   --rdk-color-range-bg: #f3e8ff;
-
-  --rdk-scroll-track: rgba(124, 58, 237, 0.04);
-  --rdk-scroll-thumb: rgba(124, 58, 237, 0.32);
-  --rdk-scroll-thumb-hover: rgba(124, 58, 237, 0.55);
 }
 
 [data-rdk-theme="dark"] {
@@ -108,10 +96,6 @@
   --rdk-color-border-strong: #3f3f46;
   --rdk-color-disabled: #3f3f46;
   --rdk-color-range-bg: #2e1065;
-
-  --rdk-scroll-track: rgba(167, 139, 250, 0.04);
-  --rdk-scroll-thumb: rgba(167, 139, 250, 0.28);
-  --rdk-scroll-thumb-hover: rgba(167, 139, 250, 0.55);
 }
 
 /* ============================================================
@@ -199,11 +183,87 @@
    per-component overrides below still win.
    ============================================================ */
 
-/* Firefox */
-:where(.rdk-font-rdk, [data-rdk-theme]) *,
+/* ------------------------------------------------------------
+   Scrollbar colours are DERIVED from `--rdk-color-primary` so a
+   picker branded with `colors={{ primary: '#e4572e' }}` gets an
+   orange scrollbar instead of the library's default violet one.
+
+   The derivation is resolved HERE, on the picker scope, and not
+   in the `:root` token blocks above. A `--rdk-scroll-thumb:
+   color-mix(…, var(--rdk-color-primary) …)` declaration on :root
+   would be substituted against the :root primary and then inherit
+   that already-resolved colour down — so a per-instance `colors`
+   override (an inline style on the picker root / popover panel)
+   could never reach it. Substituting on the scope element, which
+   is the very element carrying the inline `--rdk-color-*` vars,
+   resolves against whichever primary is in scope for this picker.
+
+   `--rdk-scroll-track` / `--rdk-scroll-thumb` /
+   `--rdk-scroll-thumb-hover` stay supported as explicit escape
+   hatches: they are undeclared by default, so the var() fallback
+   (the derived colour) applies unless a host actually sets them.
+   ------------------------------------------------------------ */
 :where(.rdk-font-rdk, [data-rdk-theme]) {
-  scrollbar-width: thin;
-  scrollbar-color: var(--rdk-scroll-thumb) var(--rdk-scroll-track);
+  --rdk-scroll-track-c: var(--rdk-scroll-track, rgba(113, 113, 122, 0.06));
+  --rdk-scroll-thumb-c: var(--rdk-scroll-thumb, rgba(113, 113, 122, 0.38));
+  --rdk-scroll-thumb-hover-c: var(
+    --rdk-scroll-thumb-hover,
+    rgba(113, 113, 122, 0.62)
+  );
+}
+@supports (color: color-mix(in srgb, red 50%, transparent)) {
+  :where(.rdk-font-rdk, [data-rdk-theme]) {
+    --rdk-scroll-track-c: var(
+      --rdk-scroll-track,
+      color-mix(in srgb, var(--rdk-color-primary) 6%, transparent)
+    );
+    --rdk-scroll-thumb-c: var(
+      --rdk-scroll-thumb,
+      color-mix(in srgb, var(--rdk-color-primary) 38%, transparent)
+    );
+    --rdk-scroll-thumb-hover-c: var(
+      --rdk-scroll-thumb-hover,
+      color-mix(in srgb, var(--rdk-color-primary) 65%, transparent)
+    );
+  }
+}
+
+/* Engines WITHOUT ::-webkit-scrollbar (Firefox): the standard properties.
+
+   These are deliberately gated. Since Chrome 121 / Edge 121, an element
+   that has a non-`auto` `scrollbar-width` or `scrollbar-color` is rendered
+   with the *standard* scrollbar and its `::-webkit-scrollbar` rules are
+   ignored wholesale — including `::-webkit-scrollbar-button { display:
+   none }`. On Windows that standard scrollbar is the Fluent one, which
+   paints stepper arrows at both ends and offers no way to remove them. So
+   declaring both syntaxes, as is the usual cross-browser advice, is exactly
+   what puts the arrows back in Blink. */
+@supports not selector(::-webkit-scrollbar) {
+  :where(.rdk-font-rdk, [data-rdk-theme]) *,
+  :where(.rdk-font-rdk, [data-rdk-theme]) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rdk-scroll-thumb-c) var(--rdk-scroll-track-c);
+  }
+}
+
+/* …and the other half of the same problem: a HOST page that sets
+   `scrollbar-color` / `scrollbar-width` globally (`* { scrollbar-width:
+   thin }` is common) pushes the picker's own scroll areas onto the standard
+   path too, arrows and all. Resetting to `auto` inside the picker keeps it
+   on the ::-webkit-scrollbar path that the rules below actually style.
+
+   Written without :where() on purpose — the rest of this file stays at
+   specificity 0 so host branding wins, but this reset has to outrank a
+   host's `*` rule no matter which stylesheet is loaded first, so it needs
+   the (0,1,0) that the class/attribute selectors give it. */
+@supports selector(::-webkit-scrollbar) {
+  .rdk-font-rdk,
+  .rdk-font-rdk *,
+  [data-rdk-theme],
+  [data-rdk-theme] * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
 }
 
 /* WebKit / Blink (Chrome, Edge, Safari) */
@@ -214,12 +274,12 @@
 }
 :where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-track,
 :where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-track {
-  background: var(--rdk-scroll-track);
+  background: var(--rdk-scroll-track-c);
   border-radius: 999px;
 }
 :where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-thumb,
 :where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-thumb {
-  background: var(--rdk-scroll-thumb);
+  background: var(--rdk-scroll-thumb-c);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -227,37 +287,95 @@
 }
 :where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-thumb:hover,
 :where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-thumb:hover {
-  background: var(--rdk-scroll-thumb-hover);
+  background: var(--rdk-scroll-thumb-hover-c);
   background-clip: padding-box;
 }
 /* Declaring any ::-webkit-scrollbar rule switches Blink/WebKit to custom
    scrollbar rendering, which brings back the platform stepper arrows at
-   both ends of the track unless they are explicitly removed. */
+   both ends of the track unless they are explicitly removed.
+
+   A bare `::-webkit-scrollbar-button` covers the usual case, but Blink also
+   matches the buttons through their directional pseudo-classes, and a host
+   stylesheet that styles `*::-webkit-scrollbar-button:vertical` (or any of
+   the `:start` / `:end` / `:single-button` forms) outranks a bare
+   `::-webkit-scrollbar-button` on specificity and puts the arrows back.
+   Listing the directional forms keeps them hidden either way. */
 :where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-button,
-:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-button {
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-button,
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-button:vertical,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-button:vertical,
+:where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-button:horizontal,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-button:horizontal,
+:where(.rdk-font-rdk, [data-rdk-theme])
+  *::-webkit-scrollbar-button:single-button,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-button:single-button,
+:where(.rdk-font-rdk, [data-rdk-theme])
+  *::-webkit-scrollbar-button:double-button,
+:where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-button:double-button,
+:where(.rdk-font-rdk, [data-rdk-theme])
+  *::-webkit-scrollbar-button:start:decrement,
+:where(
+    .rdk-font-rdk,
+    [data-rdk-theme]
+  )::-webkit-scrollbar-button:start:decrement,
+:where(.rdk-font-rdk, [data-rdk-theme])
+  *::-webkit-scrollbar-button:end:increment,
+:where(
+    .rdk-font-rdk,
+    [data-rdk-theme]
+  )::-webkit-scrollbar-button:end:increment {
   display: none;
   width: 0;
   height: 0;
+  background: transparent;
 }
 :where(.rdk-font-rdk, [data-rdk-theme]) *::-webkit-scrollbar-corner,
 :where(.rdk-font-rdk, [data-rdk-theme])::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-/* Time columns are narrow — render a tighter 6px scrollbar
-   inside them so the thumb doesn't dominate the column. */
+/* Time columns are narrow — render a hairline scrollbar inside them so the
+   thumb reads as an indicator rather than as a control. The width is exposed
+   as `--rdk-time-col-scrollbar` for hosts that want it thicker again.
+
+   These rules repeat the button and track resets at `.rdk-time-col`
+   specificity (0,1,1) instead of relying on the scoped `:where()` ones
+   (0,0,1): a host page that styles `*::-webkit-scrollbar-button` globally
+   ties or beats the scoped rule and the arrows come back inside the time
+   columns. Repeating them here makes the columns immune to that. */
 .rdk-time-col::-webkit-scrollbar {
-  width: 6px;
+  width: var(--rdk-time-col-scrollbar, 4px);
+  height: var(--rdk-time-col-scrollbar, 4px);
 }
 .rdk-time-col::-webkit-scrollbar-thumb {
-  background: var(--rdk-scroll-thumb);
+  background: var(--rdk-scroll-thumb-c);
   border: 0;
   background-clip: padding-box;
-  border-radius: 3px;
+  border-radius: 999px;
 }
 .rdk-time-col::-webkit-scrollbar-thumb:hover {
-  background: var(--rdk-scroll-thumb-hover);
+  background: var(--rdk-scroll-thumb-hover-c);
 }
 .rdk-time-col::-webkit-scrollbar-track {
   background: transparent;
+}
+.rdk-time-col::-webkit-scrollbar-button,
+.rdk-time-col::-webkit-scrollbar-button:vertical,
+.rdk-time-col::-webkit-scrollbar-button:horizontal,
+.rdk-time-col::-webkit-scrollbar-button:single-button,
+.rdk-time-col::-webkit-scrollbar-button:double-button,
+.rdk-time-col::-webkit-scrollbar-button:start:decrement,
+.rdk-time-col::-webkit-scrollbar-button:end:increment {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+/* Firefox has no button pseudo-elements — `thin` already omits the arrows.
+   Gated for the same reason as the block above: setting this unconditionally
+   would switch Blink to the standard scrollbar and undo the resets here. */
+@supports not selector(::-webkit-scrollbar) {
+  .rdk-time-col {
+    scrollbar-width: thin;
+  }
 }

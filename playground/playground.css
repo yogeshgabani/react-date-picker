@@ -113,10 +113,19 @@ body[data-theme='dark'] {
   --pg-scroll-thumb-hover: rgba(167, 139, 250, 0.55);
 }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--pg-scroll-thumb) var(--pg-scroll-track);
+/* Engines WITHOUT ::-webkit-scrollbar (Firefox) only.
+
+   Since Chrome 121 an element with a non-`auto` `scrollbar-width` or
+   `scrollbar-color` is rendered with the standard scrollbar and its
+   `::-webkit-scrollbar` rules are ignored entirely — on Windows that means
+   the Fluent scrollbar, complete with stepper arrows that no CSS can remove.
+   Declaring both syntaxes unconditionally is what put arrows on every scroll
+   surface of this page. */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pg-scroll-thumb) var(--pg-scroll-track);
+  }
 }
 
 /* WebKit / Blink (Chrome, Edge, Safari) */
@@ -143,6 +152,22 @@ body[data-theme='dark'] {
   background: transparent;
 }
 
+/* Styling `*::-webkit-scrollbar` above switches every scroll surface on the
+   page into Blink's custom scrollbar rendering, which restores the platform
+   stepper arrows unless they are removed explicitly. */
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-button:vertical,
+*::-webkit-scrollbar-button:horizontal,
+*::-webkit-scrollbar-button:single-button,
+*::-webkit-scrollbar-button:double-button,
+*::-webkit-scrollbar-button:start:decrement,
+*::-webkit-scrollbar-button:end:increment {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
 /* Inside the dark code panel the thumb needs a softer tint
    so it doesn't read as a separate UI element. */
 .pg-cz-code-panel *::-webkit-scrollbar-thumb {
@@ -153,8 +178,10 @@ body[data-theme='dark'] {
   background: rgba(255, 255, 255, 0.28);
   background-clip: padding-box;
 }
-.pg-cz-code-panel * {
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+@supports not selector(::-webkit-scrollbar) {
+  .pg-cz-code-panel * {
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  }
 }
 
 /* Aurora background blobs */

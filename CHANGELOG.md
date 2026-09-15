@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-15
+
+### Added
+- **`colors.scrollTrack` / `colors.scrollThumb` / `colors.scrollThumbHover`** — explicit per-instance overrides for the scrollbar inside the picker (time columns, preset list, any scrolling panel). They map to the existing `--rdk-scroll-track` / `--rdk-scroll-thumb` / `--rdk-scroll-thumb-hover` variables, which remain supported for global overrides.
+
+### Fixed
+- **Stepper arrows on every scrollbar in the picker** — the stylesheet declared both scrollbar syntaxes side by side (`scrollbar-width` / `scrollbar-color` "for Firefox", plus `::-webkit-scrollbar` rules "for Chrome"), which is the usual cross-browser advice. Since Chrome 121 / Edge 121 it is actively wrong: an element with a non-`auto` `scrollbar-width` or `scrollbar-color` is rendered with the **standard** scrollbar and its `::-webkit-scrollbar` rules are ignored wholesale — `::-webkit-scrollbar-button { display: none }` included. On Windows that standard scrollbar is the Fluent one, which paints stepper arrows at both ends and offers no CSS to remove them. The standard properties are now gated behind `@supports not selector(::-webkit-scrollbar)` so only Firefox sees them, and Blink/WebKit stay on the `::-webkit-scrollbar` path.
+- **Host pages could put the arrows back** — a consumer app with a global `* { scrollbar-width: thin }` or `* { scrollbar-color: … }` pushed the picker's own scroll areas onto the standard scrollbar too. Inside the picker both properties are now reset to `auto` for engines that support `::-webkit-scrollbar`, at a specificity that outranks a bare `*` rule regardless of stylesheet order. The `::-webkit-scrollbar-button` reset also covers the directional (`:vertical` / `:start` / `:single-button` …) forms and is repeated at `.rdk-time-col` specificity.
+- **Time-column scrollbar was too wide** — reduced from 6px to a 4px hairline with a fully rounded thumb, so it reads as a position indicator rather than a control. Override with `--rdk-time-col-scrollbar` if you want it thicker.
+- **Scrollbars ignored `colors.primary`** — the scrollbar tokens were hard-coded to the library's default violet (`rgba(124, 58, 237, …)`) and declared in the `:root` token blocks. A picker branded with, say, `colors={{ primary: '#e4572e' }}` therefore kept a violet/grey scrollbar that read as the browser default against a custom-coloured panel. Scrollbar colours are now *derived* from whichever `--rdk-color-primary` is in scope, so branding `primary` alone recolours the scrollbar.
+
+  The derivation is deliberately resolved on the picker scope rather than on `:root`: a `color-mix(…, var(--rdk-color-primary) …)` declaration on `:root` is substituted against the *root* primary and then inherits that already-resolved colour down, so a per-instance `colors` override (an inline style on the picker root / popover panel) could never have reached it. Browsers without `color-mix()` fall back to a neutral grey via `@supports`.
+
 ## [1.4.0] - 2026-08-31
 
 ### Added

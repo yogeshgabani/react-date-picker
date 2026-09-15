@@ -18,6 +18,9 @@ const VAR_MAP: Record<keyof PickerColors, string> = {
   disabled: '--rdk-color-disabled',
   rangeBg: '--rdk-color-range-bg',
   focus: '--rdk-color-primary',
+  scrollTrack: '--rdk-scroll-track',
+  scrollThumb: '--rdk-scroll-thumb',
+  scrollThumbHover: '--rdk-scroll-thumb-hover',
 };
 
 /**

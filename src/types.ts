@@ -83,6 +83,16 @@ export interface PickerColors {
   rangeBg?: string;
   /** Focus ring color (defaults to primary) */
   focus?: string;
+  /**
+   * Scrollbar track colour inside the picker (time columns, preset list,
+   * scrolling panels). Defaults to a 6% tint of {@link PickerColors.primary},
+   * so branding `primary` alone already recolours the scrollbar.
+   */
+  scrollTrack?: string;
+  /** Scrollbar thumb colour. Defaults to a 38% tint of `primary`. */
+  scrollThumb?: string;
+  /** Scrollbar thumb hover colour. Defaults to a 65% tint of `primary`. */
+  scrollThumbHover?: string;
 }
 
 export interface BaseProps {
