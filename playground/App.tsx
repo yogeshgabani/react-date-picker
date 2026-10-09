@@ -23,6 +23,8 @@ type Category = "all" | "date" | "range" | "time" | "datetime" | "theming";
 const SITE_LAST_UPDATED = "August 31, 2026";
 const STATS_NAMESPACE = "react-datetime-kit-playground";
 const SESSION_VISIT_FLAG = "rdtk_visited";
+const NPM_PACKAGE = "react-datetime-kit";
+const NPM_FIRST_PUBLISHED = "2026-05-26";
 const THEME_STORAGE_KEY = "rdtk-theme-pref";
 const WHATS_NEW_STORAGE_KEY = "rdtk-whatsnew-seen";
 
@@ -366,6 +368,56 @@ function useVisitorStats(): VisitorStats {
   return stats;
 }
 
+// All-time npm downloads. The downloads API silently clamps a range to
+// 18 months, so sum one-year windows from the first publish to today.
+function useNpmDownloads(): number | null {
+  const [downloads, setDownloads] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const DAY_MS = 86_400_000;
+    const iso = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+    const end = Date.now();
+    const ranges: string[] = [];
+    for (
+      let from = Date.parse(NPM_FIRST_PUBLISHED);
+      from <= end;
+      from += 365 * DAY_MS
+    ) {
+      ranges.push(`${iso(from)}:${iso(Math.min(from + 364 * DAY_MS, end))}`);
+    }
+
+    const fetchRange = async (range: string) => {
+      try {
+        const res = await fetch(
+          `https://api.npmjs.org/downloads/point/${range}/${NPM_PACKAGE}`,
+        );
+        if (!res.ok) return null;
+        const data = (await res.json()) as { downloads?: number };
+        return typeof data.downloads === "number" ? data.downloads : null;
+      } catch {
+        return null;
+      }
+    };
+
+    void Promise.all(ranges.map(fetchRange)).then((counts) => {
+      if (cancelled) return;
+      // A partial sum would understate the total — show "—" instead.
+      setDownloads(
+        counts.every((c): c is number => c !== null)
+          ? counts.reduce((sum, c) => sum + c, 0)
+          : null,
+      );
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return downloads;
+}
+
 function useCountUp(target: number | null, durationMs = 1400): number | null {
   const [value, setValue] = useState<number | null>(null);
 
@@ -632,6 +684,8 @@ export function App() {
   const { hits, visitors } = useVisitorStats();
   const hitsAnim = useCountUp(hits);
   const visitorsAnim = useCountUp(visitors);
+  const npmDownloads = useNpmDownloads();
+  const npmDownloadsAnim = useCountUp(npmDownloads);
 
   const [comingSoon, setComingSoon] = useState<SocialLink | null>(null);
 
@@ -1991,6 +2045,28 @@ export function App() {
             <span className="pg-stat-body">
               <span className="pg-stat-label">Last Updated</span>
               <span className="pg-stat-value">{SITE_LAST_UPDATED}</span>
+            </span>
+          </div>
+
+          <div className="pg-stat">
+            <span className="pg-stat-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <path d="M7 10l5 5 5-5M12 15V3" />
+              </svg>
+            </span>
+            <span className="pg-stat-body">
+              <span className="pg-stat-label">npm Downloads</span>
+              <span className="pg-stat-value pg-stat-num">
+                {formatStat(npmDownloadsAnim)}
+              </span>
             </span>
           </div>
 
